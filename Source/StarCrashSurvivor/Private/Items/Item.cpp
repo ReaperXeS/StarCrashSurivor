@@ -3,6 +3,7 @@
 
 #include "Items/Item.h"
 
+#include "Characters/HeroCharacter.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -18,8 +19,7 @@ AItem::AItem()
 		
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
-	SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Overlap with pawn only
 }
@@ -40,17 +40,17 @@ float AItem::TransformedSin()
 
 void AItem::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (GEngine)
+	if (AHeroCharacter* Hero = Cast<AHeroCharacter>(OtherActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap Begin"));
+		Hero->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (GEngine)
+	if (AHeroCharacter* Hero = Cast<AHeroCharacter>(OtherActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap End"));
+		Hero->SetOverlappingItem(nullptr);
 	}
 }
 
@@ -59,6 +59,9 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	if (HoveringEnabled)
+	{
+		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	}
 }
 

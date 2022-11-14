@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Items/Weapons/Weapon.h"
 
 // Sets default values
 AHeroCharacter::AHeroCharacter()
@@ -62,7 +63,8 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("ZoomInCamera", IE_Pressed, this, &AHeroCharacter::ZoomInCamera);
-	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);	
+	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AHeroCharacter::EKeyPressed);
 }
 
 void AHeroCharacter::MoveForward(const float AxisValue)
@@ -97,6 +99,14 @@ void AHeroCharacter::LookUp(const float AxisValue)
 void AHeroCharacter::Turn(const float AxisValue)
 {
 	AddControllerYawInput(AxisValue);
+}
+
+void AHeroCharacter::EKeyPressed()
+{
+	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
+	{
+		Weapon->Equip(GetMesh(), "Socket_RightHand");
+	}
 }
 
 void AHeroCharacter::ZoomInCamera()

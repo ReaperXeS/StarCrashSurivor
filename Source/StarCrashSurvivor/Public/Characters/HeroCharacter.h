@@ -9,6 +9,7 @@
 /***
  * Forward Declarations
  */
+class AItem;
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
@@ -55,6 +56,13 @@ private:
 	/*
 	 * Action Mapping
 	 * */
+	void EKeyPressed();
 	void ZoomInCamera();
 	void ZoomOutCamera();
+
+	UPROPERTY(VisibleInstanceOnly) 
+	AItem* OverlappingItem;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 };
