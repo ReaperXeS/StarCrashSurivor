@@ -9,6 +9,12 @@
 class UStaticMeshComponent;
 class USphereComponent;
 
+UENUM(BlueprintType)
+enum class EItemState : uint8 {
+	EIS_Hovering UMETA(DisplayName = "Hovering"),
+	EIS_Equipped UMETA(DisplayName = "Equipped"),
+};
+
 UCLASS()
 class STARCRASHSURVIVOR_API AItem : public AActor
 {
@@ -44,7 +50,7 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool HoveringEnabled = true;
+	EItemState ItemState = EItemState::EIS_Hovering;
 	
 
 };

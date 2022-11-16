@@ -65,6 +65,7 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("ZoomInCamera", IE_Pressed, this, &AHeroCharacter::ZoomInCamera);
 	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AHeroCharacter::EKeyPressed);
+	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::Attack);
 }
 
 void AHeroCharacter::MoveForward(const float AxisValue)
@@ -101,6 +102,17 @@ void AHeroCharacter::Turn(const float AxisValue)
 	AddControllerYawInput(AxisValue);
 }
 
+void AHeroCharacter::Attack()
+{
+	if (ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_EquippedOneHanded && GetMesh() && GetMesh()->GetAnimInstance() && AttackMontage)
+	{
+		ActionState = EActionState::EAS_Attacking;
+		GetMesh()->GetAnimInstance()->Montage_Play(AttackMontage);
+		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 2)));
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionName, AttackMontage);
+	}
+}
+
 void AHeroCharacter::EKeyPressed()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
@@ -118,5 +130,10 @@ void AHeroCharacter::ZoomInCamera()
 void AHeroCharacter::ZoomOutCamera()
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + 20.f, 100.f, 500.f);
+}
+
+void AHeroCharacter::OnAttackEnd()
+{
+	ActionState = EActionState::EAS_Idle;
 }
 

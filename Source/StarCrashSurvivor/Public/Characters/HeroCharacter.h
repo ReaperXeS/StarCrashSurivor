@@ -14,6 +14,7 @@ class AItem;
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
+class UAnimMontage;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AHeroCharacter : public ACharacter
@@ -57,6 +58,7 @@ private:
 	/*
 	 * Action Mapping
 	 * */
+	void Attack();
 	void EKeyPressed();
 	void ZoomInCamera();
 	void ZoomOutCamera();
@@ -65,8 +67,17 @@ private:
 	AItem* OverlappingItem;
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	EActionState ActionState = EActionState::EAS_Idle;
+
+	/***
+	 * Animation Montages
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* AttackMontage;
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+
+	void OnAttackEnd();
 };

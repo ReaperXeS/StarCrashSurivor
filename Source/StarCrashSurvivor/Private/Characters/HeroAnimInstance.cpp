@@ -6,6 +6,14 @@
 #include "Characters/HeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+void UHeroAnimInstance::OnAttackEnd()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnAttackEnd();
+	}
+}
+
 void UHeroAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();

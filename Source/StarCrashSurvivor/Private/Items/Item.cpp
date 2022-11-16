@@ -59,7 +59,7 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HoveringEnabled)
+	if (ItemState == EItemState::EIS_Hovering)
 	{
 		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
 	}

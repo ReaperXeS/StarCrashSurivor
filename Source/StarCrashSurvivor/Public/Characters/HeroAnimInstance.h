@@ -14,6 +14,9 @@ UCLASS()
 class STARCRASHSURVIVOR_API UHeroAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
+protected:
+	UFUNCTION(BlueprintCallable)
+	void OnAttackEnd();
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

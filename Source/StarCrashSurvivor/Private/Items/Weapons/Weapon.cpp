@@ -9,7 +9,7 @@ void AWeapon::Equip(USceneComponent* InParent, const FName SocketName)
 {
 	if (InParent && MeshComp)
 	{
-		HoveringEnabled = false;
+		ItemState = EItemState::EIS_Equipped;
 		MeshComp->AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	}
 }
