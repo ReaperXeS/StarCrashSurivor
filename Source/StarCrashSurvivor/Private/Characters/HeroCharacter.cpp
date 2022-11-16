@@ -106,6 +106,7 @@ void AHeroCharacter::EKeyPressed()
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
 	{
 		Weapon->Equip(GetMesh(), "Socket_RightHand");
+		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 	}
 }
 

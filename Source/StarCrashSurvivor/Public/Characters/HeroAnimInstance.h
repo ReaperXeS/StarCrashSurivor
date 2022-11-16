@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterTypes.h"
 #include "Animation/AnimInstance.h"
 #include "HeroAnimInstance.generated.h"
 
@@ -28,4 +29,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool IsFalling = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 };

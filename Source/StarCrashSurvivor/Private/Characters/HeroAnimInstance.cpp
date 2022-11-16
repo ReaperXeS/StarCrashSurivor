@@ -26,4 +26,9 @@ void UHeroAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		GroundSpeed = HeroMovementComponent->Velocity.Size2D();
 		IsFalling = HeroMovementComponent->IsFalling();
 	}
+
+	if (HeroCharacter)
+	{
+		CharacterState = HeroCharacter->GetCharacterState();
+	}
 }
