@@ -14,6 +14,30 @@ void UHeroAnimInstance::OnAttackEnd()
 	}
 }
 
+void UHeroAnimInstance::OnHideWeaponAttachToSocket()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnHideWeaponAttachToSocket();
+	}
+}
+
+void UHeroAnimInstance::OnShowWeaponAttachToSocket()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnShowWeaponAttachToSocket();
+	}
+}
+
+void UHeroAnimInstance::OnEquipEnd() const
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnEquipEnd();
+	}
+}
+
 void UHeroAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();

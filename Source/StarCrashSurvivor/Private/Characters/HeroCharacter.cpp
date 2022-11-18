@@ -14,16 +14,16 @@
 AHeroCharacter::AHeroCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetCapsuleComponent());
 	CameraBoom->TargetArmLength = 300.f;
 	CameraBoom->bUsePawnControlRotation = true;
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraBoom);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -31,25 +31,17 @@ AHeroCharacter::AHeroCharacter()
 	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
 	Hair->SetupAttachment(GetMesh());
 	Hair->AttachmentName = FString("head");
-	
+
 	EyeBrows = CreateDefaultSubobject<UGroomComponent>(TEXT("EyeBrows"));
 	EyeBrows->SetupAttachment(GetMesh());
 	EyeBrows->AttachmentName = FString("head");
 }
 
 // Called when the game starts or when spawned
-void AHeroCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
+void AHeroCharacter::BeginPlay() { Super::BeginPlay(); }
 
 // Called every frame
-void AHeroCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
+void AHeroCharacter::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
 // Called to bind functionality to input
 void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -70,24 +62,24 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AHeroCharacter::MoveForward(const float AxisValue)
 {
-	if (Controller && AxisValue != 0)
+	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
 	{
 		// Move Forward where we look
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		
+
 		AddMovementInput(Direction, AxisValue);
 	}
 }
 
 void AHeroCharacter::MoveRight(const float AxisValue)
 {
-	if (Controller && AxisValue != 0)
+	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
 	{
 		// Move Right from direction we are looking
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		
+
 		AddMovementInput(Direction, AxisValue);
 	}
 }
@@ -97,27 +89,50 @@ void AHeroCharacter::LookUp(const float AxisValue)
 	AddControllerPitchInput(AxisValue);
 }
 
-void AHeroCharacter::Turn(const float AxisValue)
+void AHeroCharacter::Turn(const float AxisValue) { AddControllerYawInput(AxisValue); }
+
+void AHeroCharacter::PlayAnimMontage(UAnimMontage* AnimMontage, const FName SectionName) const
 {
-	AddControllerYawInput(AxisValue);
+	if (GetMesh() && GetMesh()->GetAnimInstance() && AnimMontage)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionName, AnimMontage);
+	}
 }
 
 void AHeroCharacter::Attack()
 {
-	if (ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_EquippedOneHanded && GetMesh() && GetMesh()->GetAnimInstance() && AttackMontage)
+	if (CanAttack())
 	{
-		ActionState = EActionState::EAS_Attacking;
-		GetMesh()->GetAnimInstance()->Montage_Play(AttackMontage);
 		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 2)));
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionName, AttackMontage);
+		PlayAnimMontage(AttackMontage, SectionName);
+		ActionState = EActionState::EAS_Attacking;
 	}
 }
 
 void AHeroCharacter::EKeyPressed()
 {
-	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem))
+	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem); Weapon && CanPickupWeapon())
 	{
-		Weapon->Equip(GetMesh(), "Socket_RightHand");
+		// TODO: Drop current weapon
+
+		// Attach new weapon
+		Weapon->AttachToSocket(GetMesh(), "Socket_RightHand");
+		CharacterState = ECharacterState::ECS_EquippedOneHanded;
+		EquippedWeapon = Weapon;
+		OverlappingItem = nullptr;
+	}
+	else if (CanHideWeapon())
+	{
+		PlayAnimMontage(EquipMontage, "UnEquip");
+		ActionState = EActionState::EAS_Equipping;
+		CharacterState = ECharacterState::ECS_UnEquipped;
+	}
+	else if (CanShowWeapon())
+	{
+		// Attach new weapon
+		PlayAnimMontage(EquipMontage, "Equip");
+		ActionState = EActionState::EAS_Equipping;
 		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 	}
 }
@@ -132,8 +147,49 @@ void AHeroCharacter::ZoomOutCamera()
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + 20.f, 100.f, 500.f);
 }
 
+bool AHeroCharacter::CanAttack() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
+}
+
+bool AHeroCharacter::CanShowWeapon() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped && EquippedWeapon;
+}
+
+bool AHeroCharacter::CanHideWeapon() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
+}
+
+bool AHeroCharacter::CanPickupWeapon() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped;
+}
+
 void AHeroCharacter::OnAttackEnd()
 {
 	ActionState = EActionState::EAS_Idle;
 }
 
+void AHeroCharacter::OnEquipEnd()
+{
+	ActionState = EActionState::EAS_Idle;
+}
+
+void AHeroCharacter::OnHideWeaponAttachToSocket() const
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachToSocket(GetMesh(), "BackWeaponHolder");
+	}
+}
+
+void AHeroCharacter::OnShowWeaponAttachToSocket() const
+{
+	// Attach new weapon
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachToSocket(GetMesh(), "Socket_RightHand");
+	}
+}

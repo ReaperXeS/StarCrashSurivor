@@ -11,6 +11,7 @@
  * Forward Declarations
  */
 class AItem;
+class AWeapon;
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
@@ -36,7 +37,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;;
 
@@ -54,6 +55,7 @@ private:
 	void MoveRight(float AxisValue);
 	void LookUp(float AxisValue);
 	void Turn(float AxisValue);
+	void PlayAnimMontage(UAnimMontage* AnimMontage, const FName SectionName) const;
 
 	/*
 	 * Action Mapping
@@ -63,11 +65,23 @@ private:
 	void ZoomInCamera();
 	void ZoomOutCamera();
 
-	UPROPERTY(VisibleInstanceOnly) 
+	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
-	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	UPROPERTY(VisibleInstanceOnly)
+	AWeapon* EquippedWeapon;
+
+	/*** 
+	 * States
+	 */
+	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	EActionState ActionState = EActionState::EAS_Idle;
+
+	bool CanAttack() const;
+	bool CanShowWeapon() const;
+	bool CanHideWeapon() const;
+	bool CanPickupWeapon() const;
+
 
 	/***
 	 * Animation Montages
@@ -75,9 +89,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* EquipMontage;
+
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 	void OnAttackEnd();
+	void OnEquipEnd();
+	void OnHideWeaponAttachToSocket() const;
+	void OnShowWeaponAttachToSocket() const;
 };

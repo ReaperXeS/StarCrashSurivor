@@ -17,6 +17,12 @@ class STARCRASHSURVIVOR_API UHeroAnimInstance : public UAnimInstance
 protected:
 	UFUNCTION(BlueprintCallable)
 	void OnAttackEnd();
+	UFUNCTION(BlueprintCallable)
+	void OnHideWeaponAttachToSocket();
+	UFUNCTION(BlueprintCallable)
+	void OnShowWeaponAttachToSocket();
+	UFUNCTION(BlueprintCallable)
+	void OnEquipEnd() const;
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
@@ -34,5 +40,5 @@ public:
 	bool IsFalling = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
-	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 };

@@ -5,7 +5,7 @@
 
 #include "Characters/HeroCharacter.h"
 
-void AWeapon::Equip(USceneComponent* InParent, const FName SocketName)
+void AWeapon::AttachToSocket(USceneComponent* InParent, const FName SocketName)
 {
 	if (InParent && MeshComp)
 	{

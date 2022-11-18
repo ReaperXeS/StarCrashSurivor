@@ -16,5 +16,5 @@ class STARCRASHSURVIVOR_API AWeapon : public AItem
 protected:
 	virtual void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 public:
-	void Equip(USceneComponent* InParent, FName SocketName);
+	void AttachToSocket(USceneComponent* InParent, FName SocketName);
 };
