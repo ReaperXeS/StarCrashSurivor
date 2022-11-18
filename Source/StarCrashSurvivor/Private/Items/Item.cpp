@@ -9,14 +9,14 @@
 // Sets default values
 AItem::AItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	SetRootComponent(MeshComp);
 
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
+
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -64,4 +64,3 @@ void AItem::Tick(float DeltaTime)
 		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
 	}
 }
-

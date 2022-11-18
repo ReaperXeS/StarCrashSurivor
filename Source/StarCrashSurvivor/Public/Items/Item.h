@@ -10,7 +10,8 @@ class UStaticMeshComponent;
 class USphereComponent;
 
 UENUM(BlueprintType)
-enum class EItemState : uint8 {
+enum class EItemState : uint8
+{
 	EIS_Hovering UMETA(DisplayName = "Hovering"),
 	EIS_Equipped UMETA(DisplayName = "Equipped"),
 };
@@ -19,11 +20,11 @@ UCLASS()
 class STARCRASHSURVIVOR_API AItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AItem();
-	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
@@ -51,6 +52,4 @@ protected:
 	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	EItemState ItemState = EItemState::EIS_Hovering;
-	
-
 };

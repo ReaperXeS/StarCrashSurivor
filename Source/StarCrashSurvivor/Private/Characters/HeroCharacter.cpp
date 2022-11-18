@@ -104,7 +104,7 @@ void AHeroCharacter::Attack()
 {
 	if (CanAttack())
 	{
-		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 2)));
+		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
 		PlayAnimMontage(AttackMontage, SectionName);
 		ActionState = EActionState::EAS_Attacking;
 	}
@@ -117,7 +117,7 @@ void AHeroCharacter::EKeyPressed()
 		// TODO: Drop current weapon
 
 		// Attach new weapon
-		Weapon->AttachToSocket(GetMesh(), "Socket_RightHand");
+		Weapon->Equip(GetMesh(), "Socket_RightHand", true);
 		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 		EquippedWeapon = Weapon;
 		OverlappingItem = nullptr;
@@ -181,7 +181,7 @@ void AHeroCharacter::OnHideWeaponAttachToSocket() const
 {
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->AttachToSocket(GetMesh(), "BackWeaponHolder");
+		EquippedWeapon->Equip(GetMesh(), "BackWeaponHolder", false);
 	}
 }
 
@@ -190,6 +190,6 @@ void AHeroCharacter::OnShowWeaponAttachToSocket() const
 	// Attach new weapon
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->AttachToSocket(GetMesh(), "Socket_RightHand");
+		EquippedWeapon->Equip(GetMesh(), "Socket_RightHand", false);
 	}
 }
