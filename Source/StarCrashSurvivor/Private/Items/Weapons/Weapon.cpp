@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Interfaces/HitInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 AWeapon::AWeapon()
@@ -74,6 +75,14 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		EDrawDebugTrace::ForDuration,
 		OutHit,
 		true);
+
+	if (OutHit.GetActor())
+	{
+		if (IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor()))
+		{
+			HitInterface->GetHit(OutHit.ImpactPoint);
+		}
+	}
 }
 
 void AWeapon::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

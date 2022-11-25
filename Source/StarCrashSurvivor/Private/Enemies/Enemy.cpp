@@ -31,3 +31,10 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
+
+void AEnemy::GetHit(const FVector& ImpactPoint)
+{
+	// Draw debug sphere
+	DrawDebugSphere(GetWorld(), ImpactPoint, 8.0f, 12, FColor::Red, false, 5.0f);
+	PlayAnimMontage(HitReactMontage, 1, "FromRight");
+}
