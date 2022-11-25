@@ -43,4 +43,7 @@ public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
+
+	UPROPERTY()
+	TArray<AActor*> IgnoreActors;
 };

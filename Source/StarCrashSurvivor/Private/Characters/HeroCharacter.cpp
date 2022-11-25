@@ -197,5 +197,6 @@ void AHeroCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewColl
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(NewCollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }

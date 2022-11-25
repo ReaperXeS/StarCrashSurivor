@@ -58,11 +58,16 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	TArray<AActor*> IgnoreActors;
-	IgnoreActors.Add(this);
-	IgnoreActors.Add(GetOwner());
-	FHitResult OutHit;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	ActorsToIgnore.Add(GetOwner());
 
+	for (AActor* Actor : IgnoreActors)
+	{
+		ActorsToIgnore.AddUnique(Actor);
+	}
+
+	FHitResult OutHit;
 	UKismetSystemLibrary::BoxTraceSingle(
 		this,
 		BoxTraceStart->GetComponentLocation(),
@@ -82,6 +87,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		{
 			HitInterface->GetHit(OutHit.ImpactPoint);
 		}
+		IgnoreActors.AddUnique(OutHit.GetActor());
 	}
 }
 
