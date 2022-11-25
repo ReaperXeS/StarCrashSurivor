@@ -38,6 +38,22 @@ void UHeroAnimInstance::OnEquipEnd() const
 	}
 }
 
+void UHeroAnimInstance::EnableWeaponCollision()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->UpdateWeaponCollision(ECollisionEnabled::QueryOnly);
+	}
+}
+
+void UHeroAnimInstance::DisableWeaponCollision()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->UpdateWeaponCollision(ECollisionEnabled::NoCollision);
+	}
+}
+
 void UHeroAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();

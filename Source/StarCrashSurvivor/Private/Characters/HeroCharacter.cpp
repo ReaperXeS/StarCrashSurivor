@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
 
 // Sets default values
@@ -18,6 +19,12 @@ AHeroCharacter::AHeroCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetCapsuleComponent());
@@ -91,21 +98,12 @@ void AHeroCharacter::LookUp(const float AxisValue)
 
 void AHeroCharacter::Turn(const float AxisValue) { AddControllerYawInput(AxisValue); }
 
-void AHeroCharacter::PlayAnimMontage(UAnimMontage* AnimMontage, const FName SectionName) const
-{
-	if (GetMesh() && GetMesh()->GetAnimInstance() && AnimMontage)
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(SectionName, AnimMontage);
-	}
-}
-
 void AHeroCharacter::Attack()
 {
 	if (CanAttack())
 	{
 		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
-		PlayAnimMontage(AttackMontage, SectionName);
+		PlayAnimMontage(AttackMontage, 1, SectionName);
 		ActionState = EActionState::EAS_Attacking;
 	}
 }
@@ -117,21 +115,21 @@ void AHeroCharacter::EKeyPressed()
 		// TODO: Drop current weapon
 
 		// Attach new weapon
-		Weapon->Equip(GetMesh(), "Socket_RightHand", true);
+		Weapon->Equip(GetMesh(), "Socket_RightHand", true, this);
 		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 		EquippedWeapon = Weapon;
 		OverlappingItem = nullptr;
 	}
 	else if (CanHideWeapon())
 	{
-		PlayAnimMontage(EquipMontage, "UnEquip");
+		PlayAnimMontage(EquipMontage, 1, "UnEquip");
 		ActionState = EActionState::EAS_Equipping;
 		CharacterState = ECharacterState::ECS_UnEquipped;
 	}
 	else if (CanShowWeapon())
 	{
 		// Attach new weapon
-		PlayAnimMontage(EquipMontage, "Equip");
+		PlayAnimMontage(EquipMontage, 1, "Equip");
 		ActionState = EActionState::EAS_Equipping;
 		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 	}
@@ -177,19 +175,27 @@ void AHeroCharacter::OnEquipEnd()
 	ActionState = EActionState::EAS_Idle;
 }
 
-void AHeroCharacter::OnHideWeaponAttachToSocket() const
+void AHeroCharacter::OnHideWeaponAttachToSocket()
 {
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->Equip(GetMesh(), "BackWeaponHolder", false);
+		EquippedWeapon->Equip(GetMesh(), "BackWeaponHolder", false, this);
 	}
 }
 
-void AHeroCharacter::OnShowWeaponAttachToSocket() const
+void AHeroCharacter::OnShowWeaponAttachToSocket()
 {
 	// Attach new weapon
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->Equip(GetMesh(), "Socket_RightHand", false);
+		EquippedWeapon->Equip(GetMesh(), "Socket_RightHand", false, this);
+	}
+}
+
+void AHeroCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewCollisionEnabled) const
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(NewCollisionEnabled);
 	}
 }

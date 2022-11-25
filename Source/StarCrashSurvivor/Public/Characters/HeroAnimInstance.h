@@ -23,6 +23,12 @@ protected:
 	void OnShowWeaponAttachToSocket();
 	UFUNCTION(BlueprintCallable)
 	void OnEquipEnd() const;
+
+	UFUNCTION(BlueprintCallable)
+	void EnableWeaponCollision();
+
+	UFUNCTION(BlueprintCallable)
+	void DisableWeaponCollision();
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

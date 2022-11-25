@@ -55,7 +55,6 @@ private:
 	void MoveRight(float AxisValue);
 	void LookUp(float AxisValue);
 	void Turn(float AxisValue);
-	void PlayAnimMontage(UAnimMontage* AnimMontage, const FName SectionName) const;
 
 	/*
 	 * Action Mapping
@@ -98,6 +97,8 @@ public:
 
 	void OnAttackEnd();
 	void OnEquipEnd();
-	void OnHideWeaponAttachToSocket() const;
-	void OnShowWeaponAttachToSocket() const;
+	void OnHideWeaponAttachToSocket();
+	void OnShowWeaponAttachToSocket();
+
+	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;
 };
