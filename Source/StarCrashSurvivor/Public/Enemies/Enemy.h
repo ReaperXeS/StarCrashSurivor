@@ -7,6 +7,7 @@
 #include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
 
+class UParticleSystem;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AEnemy : public ACharacter, public IHitInterface
@@ -34,6 +35,15 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	UParticleSystem* HitParticle;
+
+	UPROPERTY(EditAnywhere, Category = "Development")
+	bool bDebug = false;
 
 public:
 };

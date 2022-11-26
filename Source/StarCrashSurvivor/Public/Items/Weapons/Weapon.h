@@ -39,6 +39,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon")
 	USceneComponent* BoxTraceEnd;
+
+	UPROPERTY(EditAnywhere, Category = "Development")
+	bool bDebug = false;
 public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 

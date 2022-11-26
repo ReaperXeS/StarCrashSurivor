@@ -4,6 +4,7 @@
 #include "Enemies/Enemy.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AEnemy::AEnemy()
@@ -53,12 +54,15 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 		Theta = -Theta;
 	}
 
-	if (GEngine)
+	if (GEngine && bDebug)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Theta: %f"), Theta));
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 60.f, 5.f, FColor::Red, 5.f);
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 100.f, 5.f, FColor::Blue, 5.f);
+
+		// Draw debug sphere
+		DrawDebugSphere(GetWorld(), ImpactPoint, 8.0f, 12, FColor::Red, false, 5.0f);
 	}
 
 	FName Section = "FromBack";
@@ -75,12 +79,20 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 		Section = "FromRight";
 	}
 
-	// Draw debug sphere
-	DrawDebugSphere(GetWorld(), ImpactPoint, 8.0f, 12, FColor::Red, false, 5.0f);
 	PlayAnimMontage(HitReactMontage, 1, Section);
 }
 
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
 	DirectionalHitReact(ImpactPoint);
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	}
+
+	if (HitParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, ImpactPoint);
+	}
 }
