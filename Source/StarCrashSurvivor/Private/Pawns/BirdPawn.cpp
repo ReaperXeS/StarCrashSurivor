@@ -10,7 +10,7 @@
 // Sets default values
 ABirdPawn::ABirdPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -21,22 +21,20 @@ ABirdPawn::ABirdPawn()
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(CapsuleComponent);
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArmComponent);
-	SpringArmComponent->TargetArmLength = 500.f;	
+	SpringArmComponent->TargetArmLength = 500.f;
 }
 
 // Called when the game starts or when spawned
 void ABirdPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ABirdPawn::MoveForward(float AxisValue)
 {
-	
 	// AddMovementInput(GetActorForwardVector(), AxisValue);
 	if (Controller && (AxisValue != 0.f))
 	{
@@ -64,7 +62,6 @@ void ABirdPawn::Turn(float AxisValue)
 void ABirdPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -76,4 +73,3 @@ void ABirdPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("LookUp", this, &ABirdPawn::LookUp);
 	PlayerInputComponent->BindAxis("Turn", this, &ABirdPawn::Turn);
 }
-

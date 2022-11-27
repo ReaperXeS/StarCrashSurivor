@@ -13,5 +13,4 @@ UCLASS()
 class STARCRASHSURVIVOR_API AStarCrashSurvivorGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 };

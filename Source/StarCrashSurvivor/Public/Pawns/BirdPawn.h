@@ -30,7 +30,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* CapsuleComponent;
 
@@ -48,5 +48,4 @@ private:
 	void MoveRight(float AxisValue);
 	void LookUp(float AxisValue);
 	void Turn(float AxisValue);
-
 };
