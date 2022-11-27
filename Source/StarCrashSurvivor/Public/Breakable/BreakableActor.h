@@ -7,6 +7,7 @@
 #include "Interfaces/HitInterface.h"
 #include "BreakableActor.generated.h"
 
+class UCapsuleComponent;
 class UGeometryCollectionComponent;
 
 UCLASS()
@@ -25,6 +26,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UGeometryCollectionComponent* GeometryCollection;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UCapsuleComponent* CapsuleComponent;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
 public:
 };
