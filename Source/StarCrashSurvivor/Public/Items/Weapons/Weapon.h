@@ -42,6 +42,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;
+
+	UFUNCTION(BlueprintImplementableEvent, Category="Weapon")
+	void CreateFields(const FVector& FieldLocation);
 public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 

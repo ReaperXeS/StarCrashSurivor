@@ -88,6 +88,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 			HitInterface->GetHit(OutHit.ImpactPoint);
 		}
 		IgnoreActors.AddUnique(OutHit.GetActor());
+		CreateFields(OutHit.ImpactPoint);
 	}
 }
 
