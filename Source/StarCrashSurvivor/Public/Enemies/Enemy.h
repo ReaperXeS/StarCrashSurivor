@@ -8,6 +8,8 @@
 #include "Enemy.generated.h"
 
 class UParticleSystem;
+class UAttributesComponent;
+class UWidgetComponent;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AEnemy : public ACharacter, public IHitInterface
@@ -44,6 +46,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UAttributesComponent* AttributesComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UWidgetComponent* HealthBarWidget;
 
 public:
 };
