@@ -2,7 +2,7 @@
 
 
 #include "Items/Item.h"
-
+#include "NiagaraComponent.h"
 #include "Characters/HeroCharacter.h"
 #include "Components/SphereComponent.h"
 
@@ -22,6 +22,9 @@ AItem::AItem()
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Overlap with pawn only
+
+	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>("Embers");
+	EmbersEffect->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned

@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Interfaces/HitInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 AWeapon::AWeapon()
 {
@@ -45,6 +46,11 @@ void AWeapon::Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound
 	if (SphereComp)
 	{
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (EmbersEffect)
+	{
+		EmbersEffect->Deactivate();
 	}
 }
 

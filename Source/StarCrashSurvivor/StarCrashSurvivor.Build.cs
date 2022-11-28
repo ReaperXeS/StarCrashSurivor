@@ -8,7 +8,7 @@ public class StarCrashSurvivor : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "GeometryCollectionEngine" });
+		PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "GeometryCollectionEngine", "Niagara" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 

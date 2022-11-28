@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Chaos/ChaosGameplayEventDispatcher.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/HitInterface.h"
 #include "BreakableActor.generated.h"
@@ -33,5 +34,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
+	bool bBroken = false;
 public:
 };

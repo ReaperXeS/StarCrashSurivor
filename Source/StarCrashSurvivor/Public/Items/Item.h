@@ -7,6 +7,7 @@
 #include "Item.generated.h"
 
 class UStaticMeshComponent;
+class UNiagaraComponent;
 class USphereComponent;
 
 UENUM(BlueprintType)
@@ -52,4 +53,7 @@ protected:
 	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	EItemState ItemState = EItemState::EIS_Hovering;
+
+	UPROPERTY(VisibleAnywhere)
+	UNiagaraComponent* EmbersEffect;
 };
