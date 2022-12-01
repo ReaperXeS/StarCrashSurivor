@@ -8,6 +8,7 @@
 #include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
 
+class AAIController;
 class UParticleSystem;
 class UAttributesComponent;
 class UHealthBarComponent;
@@ -76,6 +77,33 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float MaxAggroDistance = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float PatrolRadius = 15.f;
+
+	UPROPERTY()
+	AAIController* AIController;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	AActor* CurrentPatrolTarget;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	TArray<AActor*> PatrolTargets;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float PatrolWaitTimeMin = 3.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float PatrolWaitTimeMax = 8.f;
+
+	void MoveToTarget(const AActor* Target) const;
+	bool InTargetRange(const AActor* Target, double Radius) const;
+
+	FTimerHandle PatrolTimerHandle;
+	void PatrolTimerFinished() const;
+	AActor* ComputeNewPatrolTarget();
+	void CheckCombatTarget();
+	void CheckCurrentPatrolTarget();
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

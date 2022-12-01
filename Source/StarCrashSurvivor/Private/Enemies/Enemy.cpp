@@ -3,6 +3,7 @@
 
 #include "Enemies/Enemy.h"
 
+#include "AIController.h"
 #include "Components/AttributesComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -15,6 +16,8 @@ AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
 	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -26,10 +29,23 @@ AEnemy::AEnemy()
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+}
+
+void AEnemy::MoveToTarget(const AActor* Target) const
+{
+	if (AIController && Target)
+	{
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(Target);
+		MoveRequest.SetAcceptanceRadius(15.f);
+		AIController->MoveTo(MoveRequest);
+	}
 }
 
 void AEnemy::BeginPlay()
@@ -41,6 +57,9 @@ void AEnemy::BeginPlay()
 		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
 		HealthBarWidget->SetVisibility(false);
 	}
+
+	AIController = Cast<AAIController>(GetController());
+	MoveToTarget(CurrentPatrolTarget);
 }
 
 void AEnemy::Die()
@@ -86,6 +105,21 @@ void AEnemy::Die()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
+{
+	if (Target)
+	{
+		const double TargetDistance = (Target->GetActorLocation() - GetActorLocation()).Size();
+		return TargetDistance <= Radius;
+	}
+	return false;
+}
+
+void AEnemy::PatrolTimerFinished() const
+{
+	MoveToTarget(CurrentPatrolTarget);
+}
+
 float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
@@ -107,21 +141,54 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 	return Damage;
 }
 
+AActor* AEnemy::ComputeNewPatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+	for (AActor* Target : PatrolTargets)
+	{
+		if (Target != CurrentPatrolTarget)
+		{
+			ValidTargets.AddUnique(Target);
+		}
+	}
+	if (ValidTargets.Num() > 0)
+	{
+		return ValidTargets[FMath::RandRange(0, ValidTargets.Num() - 1)];
+	}
+
+	return nullptr;
+}
+
+void AEnemy::CheckCombatTarget()
+{
+	if (CombatTarget && !InTargetRange(CombatTarget, MaxAggroDistance))
+	{
+		CombatTarget = nullptr;
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->SetVisibility(false);
+		}
+	}
+}
+
+void AEnemy::CheckCurrentPatrolTarget()
+{
+	if (InTargetRange(CurrentPatrolTarget, PatrolRadius))
+	{
+		CurrentPatrolTarget = ComputeNewPatrolTarget();
+		if (CurrentPatrolTarget)
+		{
+			GetWorldTimerManager().SetTimer(PatrolTimerHandle, this, &AEnemy::PatrolTimerFinished, FMath::RandRange(PatrolWaitTimeMin, PatrolWaitTimeMax));
+		}
+	}
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CombatTarget)
-	{
-		if (const FVector LocationDelta = CombatTarget->GetActorLocation() - GetActorLocation(); LocationDelta.Size() > MaxAggroDistance)
-		{
-			CombatTarget = nullptr;
-			if (HealthBarWidget)
-			{
-				HealthBarWidget->SetVisibility(false);
-			}
-		}
-	}
+	CheckCombatTarget();
+	CheckCurrentPatrolTarget();
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
