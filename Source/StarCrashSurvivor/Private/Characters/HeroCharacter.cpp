@@ -45,7 +45,11 @@ AHeroCharacter::AHeroCharacter()
 }
 
 // Called when the game starts or when spawned
-void AHeroCharacter::BeginPlay() { Super::BeginPlay(); }
+void AHeroCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	Tags.Add(FName("HeroCharacter"));
+}
 
 // Called every frame
 void AHeroCharacter::Tick(float DeltaTime) { Super::Tick(DeltaTime); }

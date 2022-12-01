@@ -4,6 +4,7 @@
 #include "Enemies/Enemy.h"
 
 #include "AIController.h"
+#include "Characters/HeroCharacter.h"
 #include "Components/AttributesComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -11,6 +12,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Perception/PawnSensingComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -29,12 +31,14 @@ AEnemy::AEnemy()
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+	PawnSensingComponent->SetPeripheralVisionAngle(45.f);
+	PawnSensingComponent->SightRadius = 4000.f;
 }
 
 void AEnemy::MoveToTarget(const AActor* Target) const
@@ -58,8 +62,14 @@ void AEnemy::BeginPlay()
 		HealthBarWidget->SetVisibility(false);
 	}
 
+	GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
+
 	AIController = Cast<AAIController>(GetController());
 	MoveToTarget(CurrentPatrolTarget);
+	if (PawnSensingComponent)
+	{
+		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+	}
 }
 
 void AEnemy::Die()
@@ -78,6 +88,7 @@ void AEnemy::Die()
 	case 2:
 		DeathState = EDeathState::EDS_Death2;
 		Section = "Death2";
+		break;
 	case 3:
 		DeathState = EDeathState::EDS_Death3;
 		Section = "Death3";
@@ -113,6 +124,18 @@ bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
 		return TargetDistance <= Radius;
 	}
 	return false;
+}
+
+void AEnemy::PawnSeen(APawn* Pawn)
+{
+	if (EnemyState != EEnemyState::EES_Chasing && Pawn->ActorHasTag(FName("HeroCharacter")))
+	{
+		EnemyState = EEnemyState::EES_Chasing;
+		GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
+		GetCharacterMovement()->MaxWalkSpeed = ChasingWalkSpeed;
+		CombatTarget = Pawn;
+		MoveToTarget(CombatTarget);
+	}
 }
 
 void AEnemy::PatrolTimerFinished() const
@@ -163,11 +186,16 @@ void AEnemy::CheckCombatTarget()
 {
 	if (CombatTarget && !InTargetRange(CombatTarget, MaxAggroDistance))
 	{
+		// Outside aggro distance, lose interest
 		CombatTarget = nullptr;
 		if (HealthBarWidget)
 		{
 			HealthBarWidget->SetVisibility(false);
 		}
+
+		EnemyState = EEnemyState::EES_Patrolling;
+		GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
+		MoveToTarget(CurrentPatrolTarget);
 	}
 }
 
@@ -187,8 +215,14 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CheckCombatTarget();
-	CheckCurrentPatrolTarget();
+	if (EnemyState > EEnemyState::EES_Patrolling)
+	{
+		CheckCombatTarget();
+	}
+	else
+	{
+		CheckCurrentPatrolTarget();
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

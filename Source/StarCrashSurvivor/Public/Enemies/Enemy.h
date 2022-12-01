@@ -11,6 +11,7 @@
 class AAIController;
 class UParticleSystem;
 class UAttributesComponent;
+class UPawnSensingComponent;
 class UHealthBarComponent;
 
 UCLASS()
@@ -69,6 +70,8 @@ protected:
 
 	void Die();
 
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
 	/**
 	 * AI
 	 */
@@ -104,6 +107,18 @@ protected:
 	AActor* ComputeNewPatrolTarget();
 	void CheckCombatTarget();
 	void CheckCurrentPatrolTarget();
+
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UPawnSensingComponent* PawnSensingComponent;
+
+	UFUNCTION()
+	void PawnSeen(APawn* Pawn);
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float PatrollingWalkSpeed = 125.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float ChasingWalkSpeed = 300.f;
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };
