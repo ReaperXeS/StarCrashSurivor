@@ -16,4 +16,6 @@ class STARCRASHSURVIVOR_API UHealthBar : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;
+
+	void SetHealthBarPercent(const float HealthPercent) const;
 };

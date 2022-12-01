@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
 
 class UParticleSystem;
 class UAttributesComponent;
-class UWidgetComponent;
+class UHealthBarComponent;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AEnemy : public ACharacter, public IHitInterface
@@ -36,6 +37,9 @@ protected:
 	 * Animation Montages
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
@@ -51,7 +55,27 @@ protected:
 	UAttributesComponent* AttributesComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UWidgetComponent* HealthBarWidget;
+	UHealthBarComponent* HealthBarWidget;
 
+	/**
+	 * States
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	EDeathState DeathState = EDeathState::EDS_Alive;
+
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	float DeathLifeSpan = 5.f;
+
+	void Die();
+
+	/**
+	 * AI
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float MaxAggroDistance = 1000.f;
 public:
+	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

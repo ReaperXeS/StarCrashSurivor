@@ -6,7 +6,8 @@
 #include "Components/AttributesComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -22,20 +23,105 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	AttributesComponent = CreateDefaultSubobject<UAttributesComponent>("Attributes");
 
-	HealthBarWidget = CreateDefaultSubobject<UWidgetComponent>("HealthBarWidget");
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
 }
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// HealthBarWidget->GetUserWidgetObject()
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
+		HealthBarWidget->SetVisibility(false);
+	}
+}
+
+void AEnemy::Die()
+{
+	// Already in death state 
+	if (DeathState != EDeathState::EDS_Alive) { return; }
+
+	// Compute Death State
+	FName Section;
+	switch (FMath::RandRange(1, 6))
+	{
+	case 1:
+		DeathState = EDeathState::EDS_Death1;
+		Section = "Death1";
+		break;
+	case 2:
+		DeathState = EDeathState::EDS_Death2;
+		Section = "Death2";
+	case 3:
+		DeathState = EDeathState::EDS_Death3;
+		Section = "Death3";
+		break;
+	case 4:
+		DeathState = EDeathState::EDS_Death4;
+		Section = "Death4";
+		break;
+	case 5:
+		DeathState = EDeathState::EDS_Death5;
+		Section = "Death5";
+		break;
+	case 6:
+		DeathState = EDeathState::EDS_Death6;
+		Section = "Death6";
+		break;
+	default:
+		DeathState = EDeathState::EDS_Death1;
+		Section = "Death1";
+		break;
+	}
+	PlayAnimMontage(DeathMontage, 1.0f, Section);
+	SetLifeSpan(DeathLifeSpan);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AttributesComponent)
+	{
+		AttributesComponent->ReceiveDamage(Damage);
+		HealthBarWidget->SetVisibility(true);
+		if (EventInstigator)
+		{
+			CombatTarget = EventInstigator->GetPawn();
+		}
+	}
+
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
+	}
+	return Damage;
 }
 
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (CombatTarget)
+	{
+		if (const FVector LocationDelta = CombatTarget->GetActorLocation() - GetActorLocation(); LocationDelta.Size() > MaxAggroDistance)
+		{
+			CombatTarget = nullptr;
+			if (HealthBarWidget)
+			{
+				HealthBarWidget->SetVisibility(false);
+			}
+		}
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -93,7 +179,15 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DirectionalHitReact(ImpactPoint);
+	if (AttributesComponent && AttributesComponent->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
+
 
 	if (HitSound)
 	{

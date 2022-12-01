@@ -45,6 +45,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, Category="Weapon")
 	void CreateFields(const FVector& FieldLocation);
+
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	float BaseDamage = 20.f;
 public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 

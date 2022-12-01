@@ -22,6 +22,10 @@ void UAttributesComponent::BeginPlay()
 	// ...
 }
 
+void UAttributesComponent::ReceiveDamage(const float DamageAmount)
+{
+	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+}
 
 // Called every frame
 void UAttributesComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

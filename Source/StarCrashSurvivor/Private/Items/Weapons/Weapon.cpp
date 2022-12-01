@@ -91,6 +91,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 	{
 		if (const IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor()))
 		{
+			UGameplayStatics::ApplyDamage(OutHit.GetActor(), BaseDamage, GetOwner() ? GetOwner()->GetInstigatorController() : nullptr, this, UDamageType::StaticClass());
 			HitInterface->Execute_GetHit(OutHit.GetActor(), OutHit.ImpactPoint);
 		}
 		IgnoreActors.AddUnique(OutHit.GetActor());

@@ -13,4 +13,11 @@ UCLASS()
 class STARCRASHSURVIVOR_API UHealthBarComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY()
+	class UHealthBar* HealthBarWidget;
+
+public:
+	void SetHealthPercent(const float HealthPercent);
 };

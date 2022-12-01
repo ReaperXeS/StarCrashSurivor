@@ -28,4 +28,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	float MaxHealth = 100.f;
 public:
+	FORCEINLINE float GetHealthPercent() const { return Health / MaxHealth; }
+	FORCEINLINE bool IsAlive() const { return Health > 0.f; }
+	void ReceiveDamage(const float DamageAmount);
 };
