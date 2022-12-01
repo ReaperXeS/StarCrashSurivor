@@ -116,6 +116,31 @@ void AEnemy::Die()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
+{
+	switch (NewState)
+	{
+	case EEnemyState::EES_Chasing:
+		EnemyState = EEnemyState::EES_Chasing;
+		GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
+		GetCharacterMovement()->MaxWalkSpeed = ChasingWalkSpeed;
+		CombatTarget = Target;
+		MoveToTarget(CombatTarget);
+		break;
+	case EEnemyState::EES_Patrolling:
+		EnemyState = EEnemyState::EES_Patrolling;
+		GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
+		MoveToTarget(CurrentPatrolTarget);
+		break;
+	case EEnemyState::EES_Attacking:
+		EnemyState = EEnemyState::EES_Attacking;
+	// PlayAnimMontage(AttackMontage);
+		break;
+	default:
+		break;
+	}
+}
+
 bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
 {
 	if (Target)
@@ -128,13 +153,10 @@ bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
 
 void AEnemy::PawnSeen(APawn* Pawn)
 {
-	if (EnemyState != EEnemyState::EES_Chasing && Pawn->ActorHasTag(FName("HeroCharacter")))
+	if (EnemyState == EEnemyState::EES_Patrolling && Pawn->ActorHasTag(FName("HeroCharacter")))
 	{
-		EnemyState = EEnemyState::EES_Chasing;
-		GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
-		GetCharacterMovement()->MaxWalkSpeed = ChasingWalkSpeed;
-		CombatTarget = Pawn;
-		MoveToTarget(CombatTarget);
+		UpdateEnemyState(EEnemyState::EES_Chasing, Pawn);
+		UE_LOG(LogTemp, Warning, TEXT("Chasing on Seen"));
 	}
 }
 
@@ -153,7 +175,7 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 		HealthBarWidget->SetVisibility(true);
 		if (EventInstigator)
 		{
-			CombatTarget = EventInstigator->GetPawn();
+			UpdateEnemyState(EEnemyState::EES_Chasing, EventInstigator->GetPawn());
 		}
 	}
 
@@ -184,7 +206,7 @@ AActor* AEnemy::ComputeNewPatrolTarget()
 
 void AEnemy::CheckCombatTarget()
 {
-	if (CombatTarget && !InTargetRange(CombatTarget, MaxAggroDistance))
+	if (EnemyState != EEnemyState::EES_Patrolling && !InTargetRange(CombatTarget, MaxAggroDistance))
 	{
 		// Outside aggro distance, lose interest
 		CombatTarget = nullptr;
@@ -193,9 +215,25 @@ void AEnemy::CheckCombatTarget()
 			HealthBarWidget->SetVisibility(false);
 		}
 
-		EnemyState = EEnemyState::EES_Patrolling;
-		GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
-		MoveToTarget(CurrentPatrolTarget);
+		UpdateEnemyState(EEnemyState::EES_Patrolling, CurrentPatrolTarget);
+		UE_LOG(LogTemp, Warning, TEXT("Patrolling"));
+	}
+	else
+	{
+		const bool InCombatRange = InTargetRange(CombatTarget, AttackDistance);
+		if (EnemyState != EEnemyState::EES_Chasing && !InCombatRange)
+		{
+			// Outside attack distance, chase character
+			UpdateEnemyState(EEnemyState::EES_Chasing, CombatTarget);
+			UE_LOG(LogTemp, Warning, TEXT("Chasing"));
+		}
+		else if (InCombatRange && EnemyState != EEnemyState::EES_Attacking)
+		{
+			// Attack character
+			UpdateEnemyState(EEnemyState::EES_Attacking, CombatTarget);
+			// PlayAnimMontage(AttackMontage);
+			UE_LOG(LogTemp, Warning, TEXT("Attack"));
+		}
 	}
 }
 
@@ -283,6 +321,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 	if (AttributesComponent && AttributesComponent->IsAlive())
 	{
 		DirectionalHitReact(ImpactPoint);
+		// Aggro on player
 	}
 	else
 	{

@@ -72,11 +72,16 @@ protected:
 
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
+	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
+
 	/**
 	 * AI
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float AttackDistance = 150.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float MaxAggroDistance = 1000.f;
