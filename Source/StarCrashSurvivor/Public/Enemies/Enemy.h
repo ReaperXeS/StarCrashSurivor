@@ -25,29 +25,32 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void StartAttackTimer();
+	void ClearAttackTimer();
+	virtual bool CanAttack() const override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthBarComponent* HealthBarWidget;
+
+	virtual void Attack() override;
 
 	/**
 	 * States
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	EDeathState DeathState = EDeathState::EDS_Alive;
+	EDeathState DeathState = EDeathState::EDS_Death1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
 	virtual void Die() override;
-
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
 
@@ -87,8 +90,10 @@ protected:
 	FTimerHandle PatrolTimerHandle;
 	void PatrolTimerFinished() const;
 	AActor* ComputeNewPatrolTarget();
+
 	void CheckCombatTarget();
 	void CheckCurrentPatrolTarget();
+	bool IsDead() const;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;
@@ -104,6 +109,22 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> WeaponClass;
+
+	/*****
+	 * Combat
+	 *****/
+	FTimerHandle AttackTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMinRate = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMaxRate = 1.f;
+
+private:
+	void UpdateHealthBarWidgetVisibility(const bool bVisible) const;
+	bool IsOutsideCombatRadius() const;
+
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Destroyed() override;

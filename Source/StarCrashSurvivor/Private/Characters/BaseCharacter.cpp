@@ -108,3 +108,14 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 
 	PlayAnimMontage(HitReactMontage, 1, Section);
 }
+
+float ABaseCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AttributesComponent)
+	{
+		AttributesComponent->ReceiveDamage(Damage);
+	}
+	return Damage;
+}
