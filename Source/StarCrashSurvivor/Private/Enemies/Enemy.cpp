@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Items/Weapons/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -67,6 +68,17 @@ void AEnemy::BeginPlay()
 	if (PawnSensingComponent)
 	{
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+	}
+
+	UWorld* World = GetWorld();
+	if (World && WeaponClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnParams);
+		EquippedWeapon->Equip(GetMesh(), "RightHandSocket", true, this);
 	}
 }
 
@@ -182,6 +194,16 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
 	}
 	return Damage;
+}
+
+void AEnemy::Destroyed()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+
+	Super::Destroyed();
 }
 
 AActor* AEnemy::ComputeNewPatrolTarget()

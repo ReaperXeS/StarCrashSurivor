@@ -101,6 +101,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float ChasingWalkSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Destroyed() override;
 };
