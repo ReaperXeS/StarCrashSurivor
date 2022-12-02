@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/BaseCharacter.h"
 #include "Characters/CharacterTypes.h"
-#include "GameFramework/Character.h"
-#include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
 
 class AAIController;
@@ -15,7 +14,7 @@ class UPawnSensingComponent;
 class UHealthBarComponent;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AEnemy : public ACharacter, public IHitInterface
+class STARCRASHSURVIVOR_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -28,33 +27,11 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void DirectionalHitReact(const FVector& ImpactPoint);
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	/***
-	 * Animation Montages
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* DeathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* HitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = "FX")
-	UParticleSystem* HitParticle;
-
-	UPROPERTY(EditAnywhere, Category = "Development")
-	bool bDebug = false;
-
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UAttributesComponent* AttributesComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthBarComponent* HealthBarWidget;
@@ -68,7 +45,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
-	void Die();
+	virtual void Die() override;
 
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 

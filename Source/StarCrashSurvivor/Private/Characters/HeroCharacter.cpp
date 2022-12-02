@@ -71,6 +71,26 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::Attack);
 }
 
+bool AHeroCharacter::CanAttack() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
+}
+
+void AHeroCharacter::Attack()
+{
+	if (CanAttack())
+	{
+		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
+		PlayAnimMontage(AttackMontage, 1, SectionName);
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+void AHeroCharacter::OnAttackEnd()
+{
+	ActionState = EActionState::EAS_Idle;
+}
+
 void AHeroCharacter::MoveForward(const float AxisValue)
 {
 	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
@@ -102,16 +122,6 @@ void AHeroCharacter::LookUp(const float AxisValue)
 
 void AHeroCharacter::Turn(const float AxisValue) { AddControllerYawInput(AxisValue); }
 
-void AHeroCharacter::Attack()
-{
-	if (CanAttack())
-	{
-		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
-		PlayAnimMontage(AttackMontage, 1, SectionName);
-		ActionState = EActionState::EAS_Attacking;
-	}
-}
-
 void AHeroCharacter::EKeyPressed()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem); Weapon && CanPickupWeapon())
@@ -139,19 +149,16 @@ void AHeroCharacter::EKeyPressed()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AHeroCharacter::ZoomInCamera()
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - 20.f, 100.f, 500.f);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AHeroCharacter::ZoomOutCamera()
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + 20.f, 100.f, 500.f);
-}
-
-bool AHeroCharacter::CanAttack() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
 }
 
 bool AHeroCharacter::CanShowWeapon() const
@@ -167,11 +174,6 @@ bool AHeroCharacter::CanHideWeapon() const
 bool AHeroCharacter::CanPickupWeapon() const
 {
 	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped;
-}
-
-void AHeroCharacter::OnAttackEnd()
-{
-	ActionState = EActionState::EAS_Idle;
 }
 
 void AHeroCharacter::OnEquipEnd()
@@ -193,14 +195,5 @@ void AHeroCharacter::OnShowWeaponAttachToSocket()
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->Equip(GetMesh(), "Socket_RightHand", false, this);
-	}
-}
-
-void AHeroCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewCollisionEnabled) const
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(NewCollisionEnabled);
-		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
