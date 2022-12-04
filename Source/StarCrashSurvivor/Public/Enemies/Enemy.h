@@ -42,7 +42,7 @@ protected:
 	 * States
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	EDeathState DeathState = EDeathState::EDS_Death1;
+	TEnumAsByte<EDeathState> DeathState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;

@@ -42,6 +42,7 @@ protected:
 	/***
 	 * Animation Montages
 	 */
+	uint8 PlayAnimMontageRandomSection(UAnimMontage* AnimMontage);
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* AttackMontage;
 

@@ -80,8 +80,7 @@ void AHeroCharacter::Attack()
 {
 	if (CanAttack())
 	{
-		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
-		PlayAnimMontage(AttackMontage, 1, SectionName);
+		PlayAnimMontageRandomSection(AttackMontage);
 		ActionState = EActionState::EAS_Attacking;
 	}
 }

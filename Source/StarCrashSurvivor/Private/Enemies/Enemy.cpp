@@ -102,8 +102,7 @@ void AEnemy::Attack()
 	Super::Attack();
 	EnemyState = EEnemyState::EES_Engaged;
 
-	const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
-	PlayAnimMontage(AttackMontage, 1, SectionName);
+	PlayAnimMontageRandomSection(AttackMontage);
 }
 
 void AEnemy::Die()
@@ -113,39 +112,11 @@ void AEnemy::Die()
 
 	EnemyState = EEnemyState::EES_Dead;
 	// Compute Death State
-	FName Section;
-	switch (FMath::RandRange(1, 6))
+	const uint8 SectionIndex = PlayAnimMontageRandomSection(DeathMontage);
+	if (const TEnumAsByte<EDeathState> DeathPose(SectionIndex); DeathPose <= EDeathState::EDS_Death6)
 	{
-	case 1:
-		DeathState = EDeathState::EDS_Death1;
-		Section = "Death1";
-		break;
-	case 2:
-		DeathState = EDeathState::EDS_Death2;
-		Section = "Death2";
-		break;
-	case 3:
-		DeathState = EDeathState::EDS_Death3;
-		Section = "Death3";
-		break;
-	case 4:
-		DeathState = EDeathState::EDS_Death4;
-		Section = "Death4";
-		break;
-	case 5:
-		DeathState = EDeathState::EDS_Death5;
-		Section = "Death5";
-		break;
-	case 6:
-		DeathState = EDeathState::EDS_Death6;
-		Section = "Death6";
-		break;
-	default:
-		DeathState = EDeathState::EDS_Death1;
-		Section = "Death1";
-		break;
+		DeathState = DeathPose;
 	}
-	PlayAnimMontage(DeathMontage, 1.0f, Section);
 	SetLifeSpan(DeathLifeSpan);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

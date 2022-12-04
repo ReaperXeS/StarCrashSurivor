@@ -34,6 +34,22 @@ void ABaseCharacter::Die()
 	// Do nothing in base
 }
 
+uint8 ABaseCharacter::PlayAnimMontageRandomSection(UAnimMontage* AnimMontage)
+{
+	if (AnimMontage)
+	{
+		const uint8 SectionIndex = FMath::RandRange(0, AnimMontage->CompositeSections.Num() - 1);
+		const FName SectionName = AnimMontage->CompositeSections[SectionIndex].SectionName;
+		if (bDebug)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Playing section %s"), *SectionName.ToString());
+		}
+		PlayAnimMontage(AnimMontage, 1.0f, SectionName);
+		return SectionIndex;
+	}
+	return -1;
+}
+
 void ABaseCharacter::OnAttackEnd()
 {
 }
