@@ -37,6 +37,7 @@ protected:
 	UHealthBarComponent* HealthBarWidget;
 
 	virtual void Attack() override;
+	virtual void OnAttackEnd() override;
 
 	/**
 	 * States

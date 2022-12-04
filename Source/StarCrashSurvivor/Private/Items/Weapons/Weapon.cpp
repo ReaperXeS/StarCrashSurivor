@@ -33,6 +33,11 @@ void AWeapon::AttachToSocket(USceneComponent* InParent, const FName SocketName)
 	}
 }
 
+bool AWeapon::ActorIsSameType(const AActor* OtherActor) const
+{
+	return GetOwner() != nullptr && OtherActor != nullptr && OtherActor->Tags.Num() > 0 && GetOwner()->ActorHasTag(OtherActor->Tags[0]);
+}
+
 void AWeapon::Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner)
 {
 	ItemState = EItemState::EIS_Equipped;
@@ -64,6 +69,8 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (ActorIsSameType(OtherActor)) { return; }
+
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 	ActorsToIgnore.Add(GetOwner());
@@ -89,7 +96,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
 	if (OutHit.GetActor())
 	{
-		if (const IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor()))
+		if (const IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor()); !ActorIsSameType(OutHit.GetActor()) && HitInterface)
 		{
 			UGameplayStatics::ApplyDamage(OutHit.GetActor(), BaseDamage, GetOwner() ? GetOwner()->GetInstigatorController() : nullptr, this, UDamageType::StaticClass());
 			HitInterface->Execute_GetHit(OutHit.GetActor(), OutHit.ImpactPoint);

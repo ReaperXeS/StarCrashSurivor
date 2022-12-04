@@ -20,13 +20,6 @@ AEnemy::AEnemy()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	GetMesh()->SetGenerateOverlapEvents(true);
-
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
@@ -38,6 +31,9 @@ AEnemy::AEnemy()
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	PawnSensingComponent->SetPeripheralVisionAngle(45.f);
 	PawnSensingComponent->SightRadius = 4000.f;
+
+
+	Tags.Add(C_TAG_ENEMY);
 }
 
 void AEnemy::MoveToTarget(const AActor* Target) const
@@ -105,6 +101,13 @@ void AEnemy::Attack()
 	PlayAnimMontageRandomSection(AttackMontage);
 }
 
+void AEnemy::OnAttackEnd()
+{
+	Super::OnAttackEnd();
+
+	EnemyState = EEnemyState::EES_None;
+}
+
 void AEnemy::Die()
 {
 	// Already in death state 
@@ -113,7 +116,7 @@ void AEnemy::Die()
 	EnemyState = EEnemyState::EES_Dead;
 	// Compute Death State
 	const uint8 SectionIndex = PlayAnimMontageRandomSection(DeathMontage);
-	if (const TEnumAsByte<EDeathState> DeathPose(SectionIndex); DeathPose <= EDeathState::EDS_Death6)
+	if (const TEnumAsByte<EDeathState> DeathPose(SectionIndex); DeathPose <= EDS_Death6)
 	{
 		DeathState = DeathPose;
 	}
@@ -161,7 +164,7 @@ bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
 
 void AEnemy::PawnSeen(APawn* Pawn)
 {
-	if (EnemyState == EEnemyState::EES_Patrolling && Pawn->ActorHasTag(FName("HeroCharacter")))
+	if (EnemyState == EEnemyState::EES_Patrolling && Pawn->ActorHasTag(C_TAG_HERO))
 	{
 		UpdateEnemyState(EEnemyState::EES_Chasing, Pawn);
 	}

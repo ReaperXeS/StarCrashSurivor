@@ -48,6 +48,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	float BaseDamage = 20.f;
+
+	bool ActorIsSameType(const AActor* OtherActor) const;
 public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 

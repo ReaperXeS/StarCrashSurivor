@@ -64,7 +64,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;
 public:
+	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
 
+	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;
 };
