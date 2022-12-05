@@ -86,11 +86,11 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	if (AttributesComponent && AttributesComponent->IsAlive())
+	if (AttributesComponent && AttributesComponent->IsAlive() && Hitter)
 	{
-		DirectionalHitReact(ImpactPoint);
+		DirectionalHitReact(Hitter->GetActorLocation());
 	}
 	else
 	{

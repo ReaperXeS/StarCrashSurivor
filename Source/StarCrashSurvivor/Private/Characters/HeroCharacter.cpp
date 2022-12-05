@@ -66,10 +66,11 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Tags.Add(C_TAG_HERO);
 }
 
-void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	Super::GetHit_Implementation(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
+	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 	ActionState = EActionState::EAS_HitReaction;
 }
 
