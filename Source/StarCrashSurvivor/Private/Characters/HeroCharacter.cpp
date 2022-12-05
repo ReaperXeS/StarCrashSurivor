@@ -66,6 +66,13 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Tags.Add(C_TAG_HERO);
 }
 
+void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+{
+	Super::GetHit_Implementation(ImpactPoint);
+
+	ActionState = EActionState::EAS_HitReaction;
+}
+
 bool AHeroCharacter::CanAttack() const
 {
 	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
@@ -181,6 +188,11 @@ void AHeroCharacter::OnHideWeaponAttachToSocket()
 	{
 		EquippedWeapon->Equip(GetMesh(), "BackWeaponHolder", false, this);
 	}
+}
+
+void AHeroCharacter::OnHitReactEnd()
+{
+	ActionState = EActionState::EAS_Idle;
 }
 
 void AHeroCharacter::OnShowWeaponAttachToSocket()

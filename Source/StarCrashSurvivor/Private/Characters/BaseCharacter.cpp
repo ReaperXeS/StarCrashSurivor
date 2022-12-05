@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Items/Weapons/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -28,6 +29,8 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
 bool ABaseCharacter::CanAttack() const
@@ -85,6 +88,24 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
 {
+	if (AttributesComponent && AttributesComponent->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	}
+
+	if (HitParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, ImpactPoint);
+	}
 }
 
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)

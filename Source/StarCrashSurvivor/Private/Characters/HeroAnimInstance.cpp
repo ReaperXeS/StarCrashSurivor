@@ -46,6 +46,14 @@ void UHeroAnimInstance::EnableWeaponCollision()
 	}
 }
 
+void UHeroAnimInstance::OnHitReactEnd()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnHitReactEnd();
+	}
+}
+
 void UHeroAnimInstance::DisableWeaponCollision()
 {
 	if (HeroCharacter)

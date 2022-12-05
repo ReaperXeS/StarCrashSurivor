@@ -28,6 +28,9 @@ protected:
 	void EnableWeaponCollision();
 
 	UFUNCTION(BlueprintCallable)
+	void OnHitReactEnd();
+
+	UFUNCTION(BlueprintCallable)
 	void DisableWeaponCollision();
 public:
 	virtual void NativeInitializeAnimation() override;

@@ -181,7 +181,6 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 
 	if (AttributesComponent && HealthBarWidget)
 	{
-		UpdateHealthBarWidgetVisibility(true);
 		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
 	}
 
@@ -297,25 +296,9 @@ void AEnemy::Tick(float DeltaTime)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	UpdateHealthBarWidgetVisibility(true);
-	if (AttributesComponent && AttributesComponent->IsAlive())
+	Super::GetHit_Implementation(ImpactPoint);
+	if (EnemyState != EEnemyState::EES_Dead)
 	{
-		DirectionalHitReact(ImpactPoint);
-		// Aggro on player
-	}
-	else
-	{
-		Die();
-	}
-
-
-	if (HitSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
-	}
-
-	if (HitParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, ImpactPoint);
+		UpdateHealthBarWidgetVisibility(true);
 	}
 }
