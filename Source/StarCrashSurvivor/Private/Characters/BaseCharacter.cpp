@@ -63,6 +63,28 @@ uint8 ABaseCharacter::PlayAnimMontageRandomSection(UAnimMontage* AnimMontage)
 	return -1;
 }
 
+FVector ABaseCharacter::GetTranslationWarpTarget()
+{
+	if (CombatTarget == nullptr) { return FVector(); }
+
+	const FVector CombatTargetLocation = CombatTarget->GetActorLocation();
+	const FVector Location = GetActorLocation();
+
+	FVector TargetToMe = (Location - CombatTargetLocation).GetSafeNormal();
+	TargetToMe *= WarpTargetDistance;
+
+	return CombatTargetLocation + TargetToMe;
+}
+
+FVector ABaseCharacter::GetRotationWarpTarget()
+{
+	if (CombatTarget)
+	{
+		return CombatTarget->GetActorLocation();
+	}
+	return FVector();
+}
+
 void ABaseCharacter::OnAttackEnd()
 {
 }
@@ -96,6 +118,8 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 	{
 		Die();
 	}
+
+	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 
 	if (HitSound)
 	{

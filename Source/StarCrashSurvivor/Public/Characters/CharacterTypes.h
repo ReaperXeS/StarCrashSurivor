@@ -34,9 +34,9 @@ enum EDeathState
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
+	EES_None UMETA(DisplayName = "None"),
 	EES_Dead UMETA(DisplayName = "Dead"),
 	EES_Patrolling UMETA(DisplayName = "Patrolling"),
-	EES_None UMETA(DisplayName = "None"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Attacking UMETA(DisplayName = "Attacking"),
 	EES_Engaged UMETA(DisplayName = "Engaged"),

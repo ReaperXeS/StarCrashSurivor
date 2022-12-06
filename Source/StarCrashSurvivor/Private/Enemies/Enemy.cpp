@@ -123,6 +123,8 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ClearPatrolTimer();
+	ClearAttackTimer();
 }
 
 void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
@@ -132,7 +134,7 @@ void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
 	case EEnemyState::EES_Chasing:
 		ClearAttackTimer();
 		EnemyState = EEnemyState::EES_Chasing;
-		GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
+		ClearPatrolTimer();
 		GetCharacterMovement()->MaxWalkSpeed = ChasingWalkSpeed;
 		CombatTarget = Target;
 		MoveToTarget(CombatTarget);
@@ -170,6 +172,11 @@ void AEnemy::PawnSeen(APawn* Pawn)
 	}
 }
 
+void AEnemy::ClearPatrolTimer()
+{
+	GetWorldTimerManager().ClearTimer(PatrolTimerHandle);
+}
+
 void AEnemy::PatrolTimerFinished() const
 {
 	MoveToTarget(CurrentPatrolTarget);
@@ -186,7 +193,8 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 
 	if (EventInstigator)
 	{
-		UpdateEnemyState(EEnemyState::EES_Chasing, EventInstigator->GetPawn());
+		CombatTarget = EventInstigator->GetPawn();
+		CheckCombatTarget();
 	}
 	return Damage;
 }
@@ -301,4 +309,8 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	{
 		UpdateHealthBarWidgetVisibility(true);
 	}
+	ClearAttackTimer();
+	ClearPatrolTimer();
+
+	StopAnimMontage(AttackMontage);
 }

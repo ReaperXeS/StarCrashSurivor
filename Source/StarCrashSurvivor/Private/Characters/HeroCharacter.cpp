@@ -70,7 +70,6 @@ void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
-	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 	ActionState = EActionState::EAS_HitReaction;
 }
 

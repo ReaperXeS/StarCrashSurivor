@@ -58,8 +58,6 @@ protected:
 	/**
 	 * AI
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "AI")
-	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float AttackDistance = 150.f;
@@ -89,6 +87,7 @@ protected:
 	bool InTargetRange(const AActor* Target, double Radius) const;
 
 	FTimerHandle PatrolTimerHandle;
+	void ClearPatrolTimer();
 	void PatrolTimerFinished() const;
 	AActor* ComputeNewPatrolTarget();
 

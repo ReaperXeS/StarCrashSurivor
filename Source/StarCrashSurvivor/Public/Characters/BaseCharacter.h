@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(VisibleInstanceOnly)
 	AWeapon* EquippedWeapon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	AActor* CombatTarget;
+
 	virtual bool CanAttack() const;
 	virtual void Attack();
 
@@ -63,6 +66,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float WarpTargetDistance = 75.f;
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
 public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
