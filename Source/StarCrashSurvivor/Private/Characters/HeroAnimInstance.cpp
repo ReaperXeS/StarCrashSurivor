@@ -86,5 +86,7 @@ void UHeroAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (HeroCharacter)
 	{
 		CharacterState = HeroCharacter->GetCharacterState();
+		DeathState = HeroCharacter->GetDeathState();
+		IsDead = HeroCharacter->IsDead();
 	}
 }

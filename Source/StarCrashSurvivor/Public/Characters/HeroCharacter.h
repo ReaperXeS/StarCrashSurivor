@@ -15,6 +15,7 @@ class AWeapon;
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
+class UHeroOverlay;
 class UAnimMontage;
 
 UCLASS()
@@ -33,6 +34,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
+	virtual void Jump() override;
+
+	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -79,6 +84,14 @@ private:
 	bool CanShowWeapon() const;
 	bool CanHideWeapon() const;
 	bool CanPickupWeapon() const;
+
+	/*****
+	 * HUD
+	 ****/
+	UPROPERTY()
+	UHeroOverlay* HeroOverlay;
+
+	void InitializeHeroOverlay();
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }

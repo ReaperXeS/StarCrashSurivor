@@ -43,9 +43,6 @@ protected:
 	 * States
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	TEnumAsByte<EDeathState> DeathState;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
@@ -54,6 +51,8 @@ protected:
 	virtual void Die() override;
 
 	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
+
+	bool IsCombatTargetDead() const;
 
 	/**
 	 * AI
@@ -93,7 +92,6 @@ protected:
 
 	void CheckCombatTarget();
 	void CheckCurrentPatrolTarget();
-	bool IsDead() const;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;

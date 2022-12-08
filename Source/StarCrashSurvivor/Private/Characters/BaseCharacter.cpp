@@ -44,7 +44,21 @@ void ABaseCharacter::Attack()
 
 void ABaseCharacter::Die()
 {
-	// Do nothing in base
+	if (IsDead()) { return; }
+
+	Tags.Add(C_TAG_DEAD);
+
+	// Compute Death State
+	const uint8 SectionIndex = PlayAnimMontageRandomSection(DeathMontage);
+	if (const TEnumAsByte<EDeathState> DeathPose(SectionIndex); DeathPose <= EDS_Death6)
+	{
+		DeathState = DeathPose;
+	}
+}
+
+bool ABaseCharacter::IsDead() const
+{
+	return ActorHasTag(C_TAG_DEAD);
 }
 
 uint8 ABaseCharacter::PlayAnimMontageRandomSection(UAnimMontage* AnimMontage)

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+inline FName C_TAG_DEAD = FName("DEAD");
 inline FName C_TAG_ENEMY = FName("Enemy");
 inline FName C_TAG_HERO = FName("HERO");
 
@@ -35,7 +36,6 @@ UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
 	EES_None UMETA(DisplayName = "None"),
-	EES_Dead UMETA(DisplayName = "Dead"),
 	EES_Patrolling UMETA(DisplayName = "Patrolling"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Attacking UMETA(DisplayName = "Attacking"),

@@ -90,7 +90,7 @@ void AEnemy::ClearAttackTimer()
 
 bool AEnemy::CanAttack() const
 {
-	return EnemyState != EEnemyState::EES_Attacking && EnemyState != EEnemyState::EES_Dead && EnemyState != EEnemyState::EES_Engaged;
+	return EnemyState != EEnemyState::EES_Attacking && !IsDead() && EnemyState != EEnemyState::EES_Engaged;
 }
 
 void AEnemy::Attack()
@@ -110,16 +110,8 @@ void AEnemy::OnAttackEnd()
 
 void AEnemy::Die()
 {
-	// Already in death state 
-	if (EnemyState == EEnemyState::EES_Dead) { return; }
+	Super::Die();
 
-	EnemyState = EEnemyState::EES_Dead;
-	// Compute Death State
-	const uint8 SectionIndex = PlayAnimMontageRandomSection(DeathMontage);
-	if (const TEnumAsByte<EDeathState> DeathPose(SectionIndex); DeathPose <= EDS_Death6)
-	{
-		DeathState = DeathPose;
-	}
 	SetLifeSpan(DeathLifeSpan);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -152,6 +144,11 @@ void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
 	default:
 		break;
 	}
+}
+
+bool AEnemy::IsCombatTargetDead() const
+{
+	return CombatTarget && CombatTarget->ActorHasTag(C_TAG_DEAD);
 }
 
 bool AEnemy::InTargetRange(const AActor* Target, const double Radius) const
@@ -242,7 +239,7 @@ bool AEnemy::IsOutsideCombatRadius() const
 
 void AEnemy::CheckCombatTarget()
 {
-	if (IsOutsideCombatRadius())
+	if (IsOutsideCombatRadius() || IsCombatTargetDead())
 	{
 		// Outside aggro distance, lose interest
 		CombatTarget = nullptr;
@@ -281,31 +278,26 @@ void AEnemy::CheckCurrentPatrolTarget()
 	}
 }
 
-bool AEnemy::IsDead() const
-{
-	return EnemyState == EEnemyState::EES_Dead;
-}
-
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	if (IsDead()) { return; }
 
-	if (EnemyState > EEnemyState::EES_Patrolling)
+	if (EnemyState == EEnemyState::EES_Patrolling)
 	{
-		CheckCombatTarget();
+		CheckCurrentPatrolTarget();
 	}
 	else
 	{
-		CheckCurrentPatrolTarget();
+		CheckCombatTarget();
 	}
 }
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
-	if (EnemyState != EEnemyState::EES_Dead)
+	if (!IsDead())
 	{
 		UpdateHealthBarWidgetVisibility(true);
 	}

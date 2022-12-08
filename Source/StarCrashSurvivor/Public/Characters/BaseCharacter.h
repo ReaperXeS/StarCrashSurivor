@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
 #include "BaseCharacter.generated.h"
@@ -41,6 +42,12 @@ protected:
 	virtual void Attack();
 
 	virtual void Die();
+
+	/*****************************
+	 * States
+	 ****************************/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	TEnumAsByte<EDeathState> DeathState;
 
 	/***
 	 * Animation Montages
@@ -81,4 +88,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	bool IsDead() const;
+
+	FORCEINLINE EDeathState GetDeathState() const { return DeathState; }
 };

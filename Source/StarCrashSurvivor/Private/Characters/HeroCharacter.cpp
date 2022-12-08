@@ -8,7 +8,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Components/AttributesComponent.h"
 #include "Components/BoxComponent.h"
+#include "HUD/HeroOverlay.h"
+#include "HUD/StarCrashSurvivorHUD.h"
 #include "Items/Weapons/Weapon.h"
 
 // Sets default values
@@ -42,6 +45,8 @@ AHeroCharacter::AHeroCharacter()
 void AHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitializeHeroOverlay();
 }
 
 // Called every frame
@@ -71,6 +76,26 @@ void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
 	ActionState = EActionState::EAS_HitReaction;
+}
+
+void AHeroCharacter::Jump()
+{
+	if (ActionState == EActionState::EAS_Idle)
+	{
+		Super::Jump();
+	}
+}
+
+float AHeroCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const auto ReturnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AttributesComponent && HeroOverlay)
+	{
+		HeroOverlay->SetHealthBarPercent(AttributesComponent->GetHealthPercent());
+	}
+
+	return ReturnValue;
 }
 
 bool AHeroCharacter::CanAttack() const
@@ -175,6 +200,24 @@ bool AHeroCharacter::CanHideWeapon() const
 bool AHeroCharacter::CanPickupWeapon() const
 {
 	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped;
+}
+
+void AHeroCharacter::InitializeHeroOverlay()
+{
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (const AStarCrashSurvivorHUD* ScsHUD = Cast<AStarCrashSurvivorHUD>(PlayerController->GetHUD()))
+		{
+			HeroOverlay = ScsHUD->GetHeroOverlay();
+			if (HeroOverlay)
+			{
+				HeroOverlay->SetHealthBarPercent(1.f);
+				HeroOverlay->SetStaminaBarPercent(1.f);
+				HeroOverlay->SetGold(0);
+				HeroOverlay->SetSoul(0);
+			}
+		}
+	}
 }
 
 void AHeroCharacter::OnEquipEnd()

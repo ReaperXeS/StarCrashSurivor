@@ -28,6 +28,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* SoulText;
 public:
+	void SetGold(const int32 Amount) const;
+	void SetSoul(const int32 Amount) const;
 	void SetHealthBarPercent(const float HealthPercent) const;
 	void SetStaminaBarPercent(const float StaminaPercent) const;
 };
