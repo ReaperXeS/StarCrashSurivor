@@ -28,6 +28,9 @@ protected:
 	void EnableWeaponCollision();
 
 	UFUNCTION(BlueprintCallable)
+	void OnHitReactEnd();
+
+	UFUNCTION(BlueprintCallable)
 	void DisableWeaponCollision();
 public:
 	virtual void NativeInitializeAnimation() override;
@@ -47,4 +50,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+	bool IsDead = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+	TEnumAsByte<EDeathState> DeathState;
 };

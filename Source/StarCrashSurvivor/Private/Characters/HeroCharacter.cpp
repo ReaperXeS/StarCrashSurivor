@@ -8,7 +8,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Components/AttributesComponent.h"
 #include "Components/BoxComponent.h"
+#include "HUD/HeroOverlay.h"
+#include "HUD/StarCrashSurvivorHUD.h"
 #include "Items/Weapons/Weapon.h"
 
 // Sets default values
@@ -19,12 +22,6 @@ AHeroCharacter::AHeroCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-
-	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
-	GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	GetMesh()->SetGenerateOverlapEvents(true);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetCapsuleComponent());
@@ -48,7 +45,8 @@ AHeroCharacter::AHeroCharacter()
 void AHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	Tags.Add(FName("HeroCharacter"));
+
+	InitializeHeroOverlay();
 }
 
 // Called every frame
@@ -69,6 +67,54 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AHeroCharacter::EKeyPressed);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::Attack);
+
+	Tags.Add(C_TAG_HERO);
+}
+
+void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+
+	ActionState = EActionState::EAS_HitReaction;
+}
+
+void AHeroCharacter::Jump()
+{
+	if (ActionState == EActionState::EAS_Idle)
+	{
+		Super::Jump();
+	}
+}
+
+float AHeroCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const auto ReturnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AttributesComponent && HeroOverlay)
+	{
+		HeroOverlay->SetHealthBarPercent(AttributesComponent->GetHealthPercent());
+	}
+
+	return ReturnValue;
+}
+
+bool AHeroCharacter::CanAttack() const
+{
+	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
+}
+
+void AHeroCharacter::Attack()
+{
+	if (CanAttack())
+	{
+		PlayAnimMontageRandomSection(AttackMontage);
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+void AHeroCharacter::OnAttackEnd()
+{
+	ActionState = EActionState::EAS_Idle;
 }
 
 void AHeroCharacter::MoveForward(const float AxisValue)
@@ -102,16 +148,6 @@ void AHeroCharacter::LookUp(const float AxisValue)
 
 void AHeroCharacter::Turn(const float AxisValue) { AddControllerYawInput(AxisValue); }
 
-void AHeroCharacter::Attack()
-{
-	if (CanAttack())
-	{
-		const FName SectionName = FName("Attack" + FString::FromInt(FMath::RandRange(1, 3)));
-		PlayAnimMontage(AttackMontage, 1, SectionName);
-		ActionState = EActionState::EAS_Attacking;
-	}
-}
-
 void AHeroCharacter::EKeyPressed()
 {
 	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem); Weapon && CanPickupWeapon())
@@ -139,19 +175,16 @@ void AHeroCharacter::EKeyPressed()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AHeroCharacter::ZoomInCamera()
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - 20.f, 100.f, 500.f);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AHeroCharacter::ZoomOutCamera()
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + 20.f, 100.f, 500.f);
-}
-
-bool AHeroCharacter::CanAttack() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
 }
 
 bool AHeroCharacter::CanShowWeapon() const
@@ -169,9 +202,22 @@ bool AHeroCharacter::CanPickupWeapon() const
 	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped;
 }
 
-void AHeroCharacter::OnAttackEnd()
+void AHeroCharacter::InitializeHeroOverlay()
 {
-	ActionState = EActionState::EAS_Idle;
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (const AStarCrashSurvivorHUD* ScsHUD = Cast<AStarCrashSurvivorHUD>(PlayerController->GetHUD()))
+		{
+			HeroOverlay = ScsHUD->GetHeroOverlay();
+			if (HeroOverlay)
+			{
+				HeroOverlay->SetHealthBarPercent(1.f);
+				HeroOverlay->SetStaminaBarPercent(1.f);
+				HeroOverlay->SetGold(0);
+				HeroOverlay->SetSoul(0);
+			}
+		}
+	}
 }
 
 void AHeroCharacter::OnEquipEnd()
@@ -187,20 +233,16 @@ void AHeroCharacter::OnHideWeaponAttachToSocket()
 	}
 }
 
+void AHeroCharacter::OnHitReactEnd()
+{
+	ActionState = EActionState::EAS_Idle;
+}
+
 void AHeroCharacter::OnShowWeaponAttachToSocket()
 {
 	// Attach new weapon
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->Equip(GetMesh(), "Socket_RightHand", false, this);
-	}
-}
-
-void AHeroCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewCollisionEnabled) const
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(NewCollisionEnabled);
-		EquippedWeapon->IgnoreActors.Empty();
 	}
 }

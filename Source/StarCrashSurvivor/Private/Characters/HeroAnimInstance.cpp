@@ -46,6 +46,14 @@ void UHeroAnimInstance::EnableWeaponCollision()
 	}
 }
 
+void UHeroAnimInstance::OnHitReactEnd()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnHitReactEnd();
+	}
+}
+
 void UHeroAnimInstance::DisableWeaponCollision()
 {
 	if (HeroCharacter)
@@ -78,5 +86,7 @@ void UHeroAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (HeroCharacter)
 	{
 		CharacterState = HeroCharacter->GetCharacterState();
+		DeathState = HeroCharacter->GetDeathState();
+		IsDead = HeroCharacter->IsDead();
 	}
 }

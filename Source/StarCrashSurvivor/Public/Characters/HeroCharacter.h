@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseCharacter.h"
 #include "CharacterTypes.h"
-#include "GameFramework/Character.h"
 #include "HeroCharacter.generated.h"
 
 /***
@@ -15,10 +15,11 @@ class AWeapon;
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
+class UHeroOverlay;
 class UAnimMontage;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ACharacter
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -31,6 +32,12 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
+	virtual void Jump() override;
+
+	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,6 +54,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UGroomComponent* EyeBrows;
 
+	/*** 
+	 * States
+	 */
+	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
+	EActionState ActionState = EActionState::EAS_Idle;
+
+	virtual bool CanAttack() const override;
+	virtual void Attack() override;
 private:
 	/**
 	 * Movement functions
@@ -59,7 +74,6 @@ private:
 	/*
 	 * Action Mapping
 	 * */
-	void Attack();
 	void EKeyPressed();
 	void ZoomInCamera();
 	void ZoomOutCamera();
@@ -67,38 +81,26 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
-	UPROPERTY(VisibleInstanceOnly)
-	AWeapon* EquippedWeapon;
-
-	/*** 
-	 * States
-	 */
-	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
-	EActionState ActionState = EActionState::EAS_Idle;
-
-	bool CanAttack() const;
 	bool CanShowWeapon() const;
 	bool CanHideWeapon() const;
 	bool CanPickupWeapon() const;
 
+	/*****
+	 * HUD
+	 ****/
+	UPROPERTY()
+	UHeroOverlay* HeroOverlay;
 
-	/***
-	 * Animation Montages
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* AttackMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* EquipMontage;
+	void InitializeHeroOverlay();
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
-	void OnAttackEnd();
+
+	virtual void OnAttackEnd() override;
 	void OnEquipEnd();
 	void OnHideWeaponAttachToSocket();
+	void OnHitReactEnd();
 	void OnShowWeaponAttachToSocket();
-
-	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;
 };

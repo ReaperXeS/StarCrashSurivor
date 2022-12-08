@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/BaseCharacter.h"
 #include "Characters/CharacterTypes.h"
-#include "GameFramework/Character.h"
-#include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
 
 class AAIController;
@@ -15,7 +14,7 @@ class UPawnSensingComponent;
 class UHealthBarComponent;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AEnemy : public ACharacter, public IHitInterface
+class STARCRASHSURVIVOR_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -26,59 +25,38 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void DirectionalHitReact(const FVector& ImpactPoint);
-
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	/***
-	 * Animation Montages
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* DeathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* HitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = "FX")
-	UParticleSystem* HitParticle;
-
-	UPROPERTY(EditAnywhere, Category = "Development")
-	bool bDebug = false;
-
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UAttributesComponent* AttributesComponent;
+	void StartAttackTimer();
+	void ClearAttackTimer();
+	virtual bool CanAttack() const override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthBarComponent* HealthBarWidget;
+
+	virtual void Attack() override;
+	virtual void OnAttackEnd() override;
 
 	/**
 	 * States
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	EDeathState DeathState = EDeathState::EDS_Alive;
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
-	void Die();
-
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+	virtual void Die() override;
 
 	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
+
+	bool IsCombatTargetDead() const;
 
 	/**
 	 * AI
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "AI")
-	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float AttackDistance = 150.f;
@@ -108,8 +86,10 @@ protected:
 	bool InTargetRange(const AActor* Target, double Radius) const;
 
 	FTimerHandle PatrolTimerHandle;
+	void ClearPatrolTimer();
 	void PatrolTimerFinished() const;
 	AActor* ComputeNewPatrolTarget();
+
 	void CheckCombatTarget();
 	void CheckCurrentPatrolTarget();
 
@@ -124,6 +104,26 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float ChasingWalkSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
+
+	/*****
+	 * Combat
+	 *****/
+	FTimerHandle AttackTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMinRate = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMaxRate = 1.f;
+
+private:
+	void UpdateHealthBarWidgetVisibility(const bool bVisible) const;
+	bool IsOutsideCombatRadius() const;
+
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Destroyed() override;
 };
