@@ -69,6 +69,7 @@ protected:
 
 	virtual bool CanAttack() const override;
 	virtual void Attack() override;
+	void Dodge();
 private:
 	/**
 	 * Movement functions
@@ -105,6 +106,7 @@ public:
 
 
 	virtual void OnAttackEnd() override;
+	virtual void OnDodgeEnd() override;
 	void OnEquipEnd();
 	void OnHideWeaponAttachToSocket();
 	void OnHitReactEnd();

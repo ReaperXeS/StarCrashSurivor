@@ -63,6 +63,9 @@ protected:
 	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DodgeMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
@@ -85,6 +88,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	virtual void OnDodgeEnd();
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;

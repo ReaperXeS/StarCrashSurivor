@@ -103,6 +103,10 @@ void ABaseCharacter::OnAttackEnd()
 {
 }
 
+void ABaseCharacter::OnDodgeEnd()
+{
+}
+
 void ABaseCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewCollisionEnabled) const
 {
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())

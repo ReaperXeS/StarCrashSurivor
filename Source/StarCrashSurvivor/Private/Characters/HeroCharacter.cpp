@@ -9,7 +9,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
 #include "Components/AttributesComponent.h"
-#include "Components/BoxComponent.h"
 #include "HUD/HeroOverlay.h"
 #include "HUD/StarCrashSurvivorHUD.h"
 #include "Items/Soul.h"
@@ -61,7 +60,15 @@ void AHeroCharacter::BeginPlay()
 }
 
 // Called every frame
-void AHeroCharacter::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
+void AHeroCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (AttributesComponent && HeroOverlay)
+	{
+		
+	}
+}
 
 // Called to bind functionality to input
 void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -78,6 +85,7 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AHeroCharacter::EKeyPressed);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::Attack);
+	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AHeroCharacter::Dodge);
 
 	Tags.Add(C_TAG_HERO);
 }
@@ -86,7 +94,10 @@ void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
-	ActionState = EActionState::EAS_HitReaction;
+	if (!IsDead())
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
 }
 
 void AHeroCharacter::Jump()
@@ -137,8 +148,24 @@ void AHeroCharacter::Attack()
 	}
 }
 
+void AHeroCharacter::Dodge()
+{
+	if (ActionState == EActionState::EAS_Idle)
+	{
+		PlayAnimMontage(DodgeMontage, 1, FName("Default"));
+		ActionState = EActionState::EAS_Dodge;
+	}
+}
+
 void AHeroCharacter::OnAttackEnd()
 {
+	ActionState = EActionState::EAS_Idle;
+}
+
+void AHeroCharacter::OnDodgeEnd()
+{
+	Super::OnDodgeEnd();
+
 	ActionState = EActionState::EAS_Idle;
 }
 
