@@ -23,8 +23,8 @@ AItem::AItem()
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Overlap with pawn only
 
-	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>("Embers");
-	EmbersEffect->SetupAttachment(GetRootComponent());
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>("Embers");
+	ItemEffect->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned

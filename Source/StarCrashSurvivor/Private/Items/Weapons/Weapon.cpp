@@ -53,9 +53,9 @@ void AWeapon::Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-	if (EmbersEffect)
+	if (ItemEffect)
 	{
-		EmbersEffect->Deactivate();
+		ItemEffect->Deactivate();
 	}
 }
 
