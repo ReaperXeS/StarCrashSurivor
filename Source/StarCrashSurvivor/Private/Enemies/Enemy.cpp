@@ -3,6 +3,7 @@
 
 #include "Enemies/Enemy.h"
 
+#include "Items/Soul.h"
 #include "AIController.h"
 #include "Characters/HeroCharacter.h"
 #include "Components/AttributesComponent.h"
@@ -117,6 +118,7 @@ void AEnemy::Die()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ClearPatrolTimer();
 	ClearAttackTimer();
+	SpawnSoul();
 }
 
 void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
@@ -222,6 +224,17 @@ AActor* AEnemy::ComputeNewPatrolTarget()
 	}
 
 	return nullptr;
+}
+
+void AEnemy::SpawnSoul() const
+{
+	if (SoulClass && AttributesComponent)
+	{
+		if (ASoul* Soul = GetWorld()->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation()))
+		{
+			Soul->SetSouls(AttributesComponent->GetSouls());
+		}
+	}
 }
 
 void AEnemy::UpdateHealthBarWidgetVisibility(const bool bVisible) const

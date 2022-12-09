@@ -21,4 +21,5 @@ protected:
 
 public:
 	FORCEINLINE int32 GetSouls() const { return Souls; }
+	FORCEINLINE void SetSouls(const int32 NewSouls) { Souls = NewSouls; }
 };

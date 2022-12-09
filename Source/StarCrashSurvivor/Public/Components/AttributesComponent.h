@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "AttributesComponent.generated.h"
 
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class STARCRASHSURVIVOR_API UAttributesComponent : public UActorComponent
 {
@@ -28,10 +27,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	float MaxHealth = 100.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	int32 Gold;
 
-	UPROPERTY(VisibleAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	int32 Souls;
 public:
 	FORCEINLINE int32 GetGold() const { return Gold; }
