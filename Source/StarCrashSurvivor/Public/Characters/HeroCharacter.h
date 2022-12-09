@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "CharacterTypes.h"
+#include "Interfaces/PickupInterface.h"
 #include "HeroCharacter.generated.h"
 
 /***
@@ -17,9 +18,11 @@ class UCameraComponent;
 class UGroomComponent;
 class UHeroOverlay;
 class UAnimMontage;
+class ATreasure;
+class ASoul;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -38,6 +41,10 @@ public:
 	virtual void Jump() override;
 
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddGold(ATreasure* Treasure) override;
+	virtual void AddSouls(ASoul* Soul) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -94,7 +101,6 @@ private:
 	void InitializeHeroOverlay();
 
 public:
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 

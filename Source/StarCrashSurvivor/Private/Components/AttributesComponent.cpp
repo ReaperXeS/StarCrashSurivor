@@ -22,6 +22,16 @@ void UAttributesComponent::BeginPlay()
 	// ...
 }
 
+void UAttributesComponent::AddGold(const int32 Amount)
+{
+	Gold += Amount;
+}
+
+void UAttributesComponent::AddSouls(const int32 Amount)
+{
+	Souls += Amount;
+}
+
 void UAttributesComponent::ReceiveDamage(const float DamageAmount)
 {
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);

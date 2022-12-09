@@ -3,8 +3,10 @@
 
 #include "Items/Item.h"
 #include "NiagaraComponent.h"
-#include "Characters/HeroCharacter.h"
 #include "Components/SphereComponent.h"
+#include "Interfaces/PickupInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 AItem::AItem()
@@ -36,14 +38,14 @@ void AItem::BeginPlay()
 	SphereComp->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereOverlapEnd);
 }
 
-float AItem::TransformedSin()
+float AItem::TransformedSin() const
 {
 	return Amplitude * FMath::Sin(GetWorld()->GetTimeSeconds() * TimeConstant);
 }
 
 void AItem::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AHeroCharacter* Hero = Cast<AHeroCharacter>(OtherActor))
+	if (IPickupInterface* Hero = Cast<IPickupInterface>(OtherActor))
 	{
 		Hero->SetOverlappingItem(this);
 	}
@@ -51,9 +53,25 @@ void AItem::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (AHeroCharacter* Hero = Cast<AHeroCharacter>(OtherActor))
+	if (IPickupInterface* Hero = Cast<IPickupInterface>(OtherActor))
 	{
 		Hero->SetOverlappingItem(nullptr);
+	}
+}
+
+void AItem::SpawnPickupSound() const
+{
+	if (PickupSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, PickupSound, GetActorLocation());
+	}
+}
+
+void AItem::SpawnPickupEffect() const
+{
+	if (PickupEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PickupEffect, GetActorLocation());
 	}
 }
 

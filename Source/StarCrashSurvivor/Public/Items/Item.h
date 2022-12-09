@@ -44,7 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hovering Parameters")
 	float TimeConstant = 5.f;
 
-	float TransformedSin();
+	float TransformedSin() const;
 
 	UFUNCTION()
 	virtual void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -54,6 +54,15 @@ protected:
 
 	EItemState ItemState = EItemState::EIS_Hovering;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	UNiagaraComponent* ItemEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	class UNiagaraSystem* PickupEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sounds")
+	USoundBase* PickupSound;
+
+	void SpawnPickupSound() const;
+	void SpawnPickupEffect() const;
 };

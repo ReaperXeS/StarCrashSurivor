@@ -12,6 +12,8 @@
 #include "Components/BoxComponent.h"
 #include "HUD/HeroOverlay.h"
 #include "HUD/StarCrashSurvivorHUD.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
 
 // Sets default values
@@ -39,6 +41,15 @@ AHeroCharacter::AHeroCharacter()
 	EyeBrows = CreateDefaultSubobject<UGroomComponent>(TEXT("EyeBrows"));
 	EyeBrows->SetupAttachment(GetMesh());
 	EyeBrows->AttachmentName = FString("head");
+}
+
+void AHeroCharacter::AddSouls(ASoul* Soul)
+{
+	if (AttributesComponent && Soul)
+	{
+		AttributesComponent->AddSouls(Soul->GetSouls());
+		HeroOverlay->SetSoul(AttributesComponent->GetSouls());
+	}
 }
 
 // Called when the game starts or when spawned
@@ -96,6 +107,20 @@ float AHeroCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, 
 	}
 
 	return ReturnValue;
+}
+
+void AHeroCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void AHeroCharacter::AddGold(ATreasure* Treasure)
+{
+	if (AttributesComponent && Treasure)
+	{
+		AttributesComponent->AddGold(Treasure->GetGold());
+		HeroOverlay->SetGold(AttributesComponent->GetGold());
+	}
 }
 
 bool AHeroCharacter::CanAttack() const
