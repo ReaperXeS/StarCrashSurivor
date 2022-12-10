@@ -69,6 +69,8 @@ protected:
 
 	virtual bool CanAttack() const override;
 	virtual void Attack() override;
+
+	bool CanDodge() const;
 	void Dodge();
 private:
 	/**

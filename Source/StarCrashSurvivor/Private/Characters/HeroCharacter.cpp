@@ -66,7 +66,8 @@ void AHeroCharacter::Tick(float DeltaTime)
 
 	if (AttributesComponent && HeroOverlay)
 	{
-		
+		AttributesComponent->RegenStamina(DeltaTime);
+		HeroOverlay->SetStaminaBarPercent(AttributesComponent->GetStaminaPercent());
 	}
 }
 
@@ -148,12 +149,22 @@ void AHeroCharacter::Attack()
 	}
 }
 
+bool AHeroCharacter::CanDodge() const
+{
+	return ActionState == EActionState::EAS_Idle && AttributesComponent->HasEnoughStamina(AttributesComponent->GetDodgeCost());
+}
+
 void AHeroCharacter::Dodge()
 {
-	if (ActionState == EActionState::EAS_Idle)
+	if (CanDodge())
 	{
 		PlayAnimMontage(DodgeMontage, 1, FName("Default"));
 		ActionState = EActionState::EAS_Dodge;
+		if (AttributesComponent && HeroOverlay)
+		{
+			AttributesComponent->UseStamina(AttributesComponent->GetDodgeCost());
+			HeroOverlay->SetStaminaBarPercent(AttributesComponent->GetStaminaPercent());
+		}
 	}
 }
 
