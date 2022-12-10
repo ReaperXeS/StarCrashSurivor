@@ -75,7 +75,7 @@ void AEnemy::BeginPlay()
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = this;
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnParams);
-		EquippedWeapon->Equip(GetMesh(), "RightHandSocket", true, this);
+		EquippedWeapon->Equip(GetMesh(), "WeaponSocket", true, this);
 	}
 }
 
@@ -318,4 +318,8 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	ClearPatrolTimer();
 
 	StopAnimMontage(AttackMontage);
+	if (InTargetRange(CombatTarget, AttackDistance) && !IsDead())
+	{
+		StartAttackTimer();
+	}
 }

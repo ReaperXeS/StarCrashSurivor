@@ -85,7 +85,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		this,
 		BoxTraceStart->GetComponentLocation(),
 		BoxTraceEnd->GetComponentLocation(),
-		FVector(5.f, 5.f, 5.f),
+		BoxTraceExtent,
 		BoxTraceStart->GetComponentRotation(),
 		TraceTypeQuery1,
 		false,
