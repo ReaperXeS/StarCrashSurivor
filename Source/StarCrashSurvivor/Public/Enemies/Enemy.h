@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 
 	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
 

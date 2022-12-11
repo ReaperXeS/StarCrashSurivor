@@ -42,7 +42,7 @@ void ABaseCharacter::Attack()
 {
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die_Implementation()
 {
 	if (IsDead()) { return; }
 

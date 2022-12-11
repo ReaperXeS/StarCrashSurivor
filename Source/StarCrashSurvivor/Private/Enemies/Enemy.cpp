@@ -109,9 +109,9 @@ void AEnemy::OnAttackEnd()
 	EnemyState = EEnemyState::EES_None;
 }
 
-void AEnemy::Die()
+void AEnemy::Die_Implementation()
 {
-	Super::Die();
+	Super::Die_Implementation();
 
 	SetLifeSpan(DeathLifeSpan);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

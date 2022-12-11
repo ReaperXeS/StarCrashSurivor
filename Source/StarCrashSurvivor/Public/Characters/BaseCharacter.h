@@ -41,7 +41,8 @@ protected:
 	virtual bool CanAttack() const;
 	virtual void Attack();
 
-	virtual void Die();
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 
 	/*****************************
 	 * States
