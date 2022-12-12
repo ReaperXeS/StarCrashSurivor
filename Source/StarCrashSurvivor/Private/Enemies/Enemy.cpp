@@ -226,12 +226,14 @@ AActor* AEnemy::ComputeNewPatrolTarget()
 	return nullptr;
 }
 
-void AEnemy::SpawnSoul() const
+void AEnemy::SpawnSoul()
 {
 	if (SoulClass && AttributesComponent)
 	{
-		if (ASoul* Soul = GetWorld()->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation()))
+		// Spawn soul above enemy
+		if (ASoul* Soul = GetWorld()->SpawnActor<ASoul>(SoulClass, GetActorLocation() + FVector(0.f, 0.f, 125.f), GetActorRotation()))
 		{
+			Soul->SetOwner(this);
 			Soul->SetSouls(AttributesComponent->GetSouls());
 		}
 	}

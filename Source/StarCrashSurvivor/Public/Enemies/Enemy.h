@@ -125,7 +125,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<ASoul> SoulClass;
 
-	void SpawnSoul() const;
+	void SpawnSoul();
 
 private:
 	void UpdateHealthBarWidgetVisibility(const bool bVisible) const;
