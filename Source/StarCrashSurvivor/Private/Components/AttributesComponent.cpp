@@ -22,9 +22,29 @@ void UAttributesComponent::BeginPlay()
 	// ...
 }
 
+void UAttributesComponent::AddGold(const int32 Amount)
+{
+	Gold += Amount;
+}
+
+void UAttributesComponent::AddSouls(const int32 Amount)
+{
+	Souls += Amount;
+}
+
 void UAttributesComponent::ReceiveDamage(const float DamageAmount)
 {
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+}
+
+void UAttributesComponent::RegenStamina(const float DeltaTime)
+{
+	Stamina = FMath::Clamp(Stamina + StaminaRegenRate * DeltaTime, 0.0f, MaxStamina);
+}
+
+void UAttributesComponent::UseStamina(const float StaminaCost)
+{
+	Stamina = FMath::Clamp(Stamina - StaminaCost, 0.0f, MaxStamina);
 }
 
 // Called every frame

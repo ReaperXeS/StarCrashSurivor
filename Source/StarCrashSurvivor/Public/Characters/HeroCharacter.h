@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "CharacterTypes.h"
+#include "InputAction.h"
+#include "Interfaces/PickupInterface.h"
 #include "HeroCharacter.generated.h"
 
 /***
@@ -17,9 +19,13 @@ class UCameraComponent;
 class UGroomComponent;
 class UHeroOverlay;
 class UAnimMontage;
+class ATreasure;
+class ASoul;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -38,6 +44,10 @@ public:
 	virtual void Jump() override;
 
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddGold(ATreasure* Treasure) override;
+	virtual void AddSouls(ASoul* Soul) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,21 +72,53 @@ protected:
 
 	virtual bool CanAttack() const override;
 	virtual void Attack() override;
+
+	bool CanDodge() const;
+	void Dodge();
+
+	/**
+	 * Input
+	 **/
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputMappingContext* HeroMappingContext;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionMove;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionLookAround;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionJump;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionZoomInOutCamera;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionInteract;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionAttack;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionDodge;
+
 private:
 	/**
 	 * Movement functions
 	 */
+	void MoveCharacter(const FInputActionValue& ActionValue);
+	void LookAround(const FInputActionValue& ActionValue);
+	void ZoomCamera(const FInputActionValue& ActionValue);
+
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
-	void LookUp(float AxisValue);
-	void Turn(float AxisValue);
 
 	/*
 	 * Action Mapping
 	 * */
+	void Interact();
 	void EKeyPressed();
-	void ZoomInCamera();
-	void ZoomOutCamera();
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
@@ -94,11 +136,11 @@ private:
 	void InitializeHeroOverlay();
 
 public:
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 
 	virtual void OnAttackEnd() override;
+	virtual void OnDodgeEnd() override;
 	void OnEquipEnd();
 	void OnHideWeaponAttachToSocket();
 	void OnHitReactEnd();

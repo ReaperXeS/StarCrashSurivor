@@ -53,9 +53,9 @@ void AWeapon::Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-	if (EmbersEffect)
+	if (ItemEffect)
 	{
-		EmbersEffect->Deactivate();
+		ItemEffect->Deactivate();
 	}
 }
 
@@ -85,7 +85,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		this,
 		BoxTraceStart->GetComponentLocation(),
 		BoxTraceEnd->GetComponentLocation(),
-		FVector(5.f, 5.f, 5.f),
+		BoxTraceExtent,
 		BoxTraceStart->GetComponentRotation(),
 		TraceTypeQuery1,
 		false,

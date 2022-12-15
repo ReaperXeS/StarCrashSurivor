@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Weapon")
 	USceneComponent* BoxTraceEnd;
 
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	FVector BoxTraceExtent = FVector(5.f, 5.f, 5.f);
+
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;
 

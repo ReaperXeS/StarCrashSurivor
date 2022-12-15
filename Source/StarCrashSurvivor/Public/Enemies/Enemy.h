@@ -7,11 +7,14 @@
 #include "Characters/CharacterTypes.h"
 #include "Enemy.generated.h"
 
+
 class AAIController;
-class UParticleSystem;
+class ASoul;
 class UAttributesComponent;
-class UPawnSensingComponent;
 class UHealthBarComponent;
+class UParticleSystem;
+class UPawnSensingComponent;
+
 
 UCLASS()
 class STARCRASHSURVIVOR_API AEnemy : public ABaseCharacter
@@ -48,7 +51,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 
 	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
 
@@ -118,6 +121,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AttackMaxRate = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<ASoul> SoulClass;
+
+	void SpawnSoul();
 
 private:
 	void UpdateHealthBarWidgetVisibility(const bool bVisible) const;

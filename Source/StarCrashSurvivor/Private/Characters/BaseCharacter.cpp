@@ -42,7 +42,7 @@ void ABaseCharacter::Attack()
 {
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die_Implementation()
 {
 	if (IsDead()) { return; }
 
@@ -100,6 +100,10 @@ FVector ABaseCharacter::GetRotationWarpTarget()
 }
 
 void ABaseCharacter::OnAttackEnd()
+{
+}
+
+void ABaseCharacter::OnDodgeEnd()
 {
 }
 

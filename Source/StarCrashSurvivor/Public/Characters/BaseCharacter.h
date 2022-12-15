@@ -41,7 +41,8 @@ protected:
 	virtual bool CanAttack() const;
 	virtual void Attack();
 
-	virtual void Die();
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 
 	/*****************************
 	 * States
@@ -61,6 +62,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DodgeMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* HitReactMontage;
@@ -85,6 +89,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	virtual void OnDodgeEnd();
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;

@@ -3,6 +3,7 @@
 
 #include "Enemies/Enemy.h"
 
+#include "Items/Soul.h"
 #include "AIController.h"
 #include "Characters/HeroCharacter.h"
 #include "Components/AttributesComponent.h"
@@ -74,7 +75,7 @@ void AEnemy::BeginPlay()
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = this;
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnParams);
-		EquippedWeapon->Equip(GetMesh(), "RightHandSocket", true, this);
+		EquippedWeapon->Equip(GetMesh(), "WeaponSocket", true, this);
 	}
 }
 
@@ -108,15 +109,16 @@ void AEnemy::OnAttackEnd()
 	EnemyState = EEnemyState::EES_None;
 }
 
-void AEnemy::Die()
+void AEnemy::Die_Implementation()
 {
-	Super::Die();
+	Super::Die_Implementation();
 
 	SetLifeSpan(DeathLifeSpan);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ClearPatrolTimer();
 	ClearAttackTimer();
+	SpawnSoul();
 }
 
 void AEnemy::UpdateEnemyState(const EEnemyState NewState, AActor* Target)
@@ -224,6 +226,19 @@ AActor* AEnemy::ComputeNewPatrolTarget()
 	return nullptr;
 }
 
+void AEnemy::SpawnSoul()
+{
+	if (SoulClass && AttributesComponent)
+	{
+		// Spawn soul above enemy
+		if (ASoul* Soul = GetWorld()->SpawnActor<ASoul>(SoulClass, GetActorLocation() + FVector(0.f, 0.f, 125.f), GetActorRotation()))
+		{
+			Soul->SetOwner(this);
+			Soul->SetSouls(AttributesComponent->GetSouls());
+		}
+	}
+}
+
 void AEnemy::UpdateHealthBarWidgetVisibility(const bool bVisible) const
 {
 	if (HealthBarWidget)
@@ -305,4 +320,8 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	ClearPatrolTimer();
 
 	StopAnimMontage(AttackMontage);
+	if (InTargetRange(CombatTarget, AttackDistance) && !IsDead())
+	{
+		StartAttackTimer();
+	}
 }
