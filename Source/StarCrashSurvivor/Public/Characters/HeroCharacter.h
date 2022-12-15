@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "CharacterTypes.h"
+#include "InputAction.h"
 #include "Interfaces/PickupInterface.h"
 #include "HeroCharacter.generated.h"
 
@@ -20,6 +21,8 @@ class UHeroOverlay;
 class UAnimMontage;
 class ATreasure;
 class ASoul;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface
@@ -72,21 +75,50 @@ protected:
 
 	bool CanDodge() const;
 	void Dodge();
+
+	/**
+	 * Input
+	 **/
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputMappingContext* HeroMappingContext;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionMove;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionLookAround;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionJump;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionZoomInOutCamera;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionInteract;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionAttack;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ActionDodge;
+
 private:
 	/**
 	 * Movement functions
 	 */
+	void MoveCharacter(const FInputActionValue& ActionValue);
+	void LookAround(const FInputActionValue& ActionValue);
+	void ZoomCamera(const FInputActionValue& ActionValue);
+
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
-	void LookUp(float AxisValue);
-	void Turn(float AxisValue);
 
 	/*
 	 * Action Mapping
 	 * */
+	void Interact();
 	void EKeyPressed();
-	void ZoomInCamera();
-	void ZoomOutCamera();
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;

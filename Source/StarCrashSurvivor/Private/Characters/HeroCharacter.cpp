@@ -14,6 +14,8 @@
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 AHeroCharacter::AHeroCharacter()
@@ -56,6 +58,14 @@ void AHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	if (const APlayerController* PC = Cast<APlayerController>(GetController()); PC && HeroMappingContext)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			InputSystem->AddMappingContext(HeroMappingContext, 0);
+		}
+	}
 	InitializeHeroOverlay();
 }
 
@@ -76,17 +86,16 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AHeroCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AHeroCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("LookUp", this, &AHeroCharacter::LookUp);
-	PlayerInputComponent->BindAxis("Turn", this, &AHeroCharacter::Turn);
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	// You can bind to any of the trigger events here by changing the "ETriggerEvent" enum value
+	Input->BindAction(ActionMove, ETriggerEvent::Triggered, this, &AHeroCharacter::MoveCharacter);
+	Input->BindAction(ActionLookAround, ETriggerEvent::Triggered, this, &AHeroCharacter::LookAround);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("ZoomInCamera", IE_Pressed, this, &AHeroCharacter::ZoomInCamera);
-	PlayerInputComponent->BindAction("ZoomOutCamera", IE_Pressed, this, &AHeroCharacter::ZoomOutCamera);
-	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AHeroCharacter::EKeyPressed);
-	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::Attack);
-	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AHeroCharacter::Dodge);
+	Input->BindAction(ActionJump, ETriggerEvent::Triggered, this, &AHeroCharacter::Jump);
+	Input->BindAction(ActionZoomInOutCamera, ETriggerEvent::Triggered, this, &AHeroCharacter::ZoomCamera);
+	Input->BindAction(ActionInteract, ETriggerEvent::Triggered, this, &AHeroCharacter::Interact);
+	Input->BindAction(ActionAttack, ETriggerEvent::Triggered, this, &AHeroCharacter::Attack);
+	Input->BindAction(ActionDodge, ETriggerEvent::Triggered, this, &AHeroCharacter::Dodge);
 
 	Tags.Add(C_TAG_HERO);
 }
@@ -180,6 +189,22 @@ void AHeroCharacter::OnDodgeEnd()
 	ActionState = EActionState::EAS_Idle;
 }
 
+void AHeroCharacter::LookAround(const FInputActionValue& ActionValue)
+{
+	// Lookup
+	AddControllerPitchInput(ActionValue.Get<FVector2d>().Y);
+	AddControllerYawInput(ActionValue.Get<FVector2d>().X);
+}
+
+void AHeroCharacter::MoveCharacter(const FInputActionValue& ActionValue)
+{
+	if (ActionState == EActionState::EAS_Idle && Controller)
+	{
+		MoveForward(ActionValue.Get<FVector2d>().Y);
+		MoveRight(ActionValue.Get<FVector2d>().X);
+	}
+}
+
 void AHeroCharacter::MoveForward(const float AxisValue)
 {
 	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
@@ -204,12 +229,32 @@ void AHeroCharacter::MoveRight(const float AxisValue)
 	}
 }
 
-void AHeroCharacter::LookUp(const float AxisValue)
+void AHeroCharacter::Interact()
 {
-	AddControllerPitchInput(AxisValue);
-}
+	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem); Weapon && CanPickupWeapon())
+	{
+		// TODO: Drop current weapon
 
-void AHeroCharacter::Turn(const float AxisValue) { AddControllerYawInput(AxisValue); }
+		// Attach new weapon
+		Weapon->Equip(GetMesh(), "Socket_RightHand", true, this);
+		CharacterState = ECharacterState::ECS_EquippedOneHanded;
+		EquippedWeapon = Weapon;
+		OverlappingItem = nullptr;
+	}
+	else if (CanHideWeapon())
+	{
+		PlayAnimMontage(EquipMontage, 1, "UnEquip");
+		ActionState = EActionState::EAS_Equipping;
+		CharacterState = ECharacterState::ECS_UnEquipped;
+	}
+	else if (CanShowWeapon())
+	{
+		// Attach new weapon
+		PlayAnimMontage(EquipMontage, 1, "Equip");
+		ActionState = EActionState::EAS_Equipping;
+		CharacterState = ECharacterState::ECS_EquippedOneHanded;
+	}
+}
 
 void AHeroCharacter::EKeyPressed()
 {
@@ -238,16 +283,10 @@ void AHeroCharacter::EKeyPressed()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-void AHeroCharacter::ZoomInCamera()
+void AHeroCharacter::ZoomCamera(const FInputActionValue& ActionValue)
 {
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - 20.f, 100.f, 500.f);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void AHeroCharacter::ZoomOutCamera()
-{
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + 20.f, 100.f, 500.f);
+	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + ActionValue.Get<float>() * 20.f, 100.f, 500.f);
+	// CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - 20.f, 100.f, 500.f);
 }
 
 bool AHeroCharacter::CanShowWeapon() const
