@@ -14,6 +14,7 @@
 #include "Items/Weapons/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Math/UnrealMathUtility.h"
 
 AEnemy::AEnemy()
 {
