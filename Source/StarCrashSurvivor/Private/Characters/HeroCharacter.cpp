@@ -153,8 +153,12 @@ void AHeroCharacter::Attack()
 {
 	if (CanAttack())
 	{
-		PlayAnimMontageRandomSection(AttackMontage);
+		PlayAnimMontage(AttackMontage);
 		ActionState = EActionState::EAS_Attacking;
+	}
+	else if (ActionState == EActionState::EAS_Attacking && bComboAttackWindowOpened)
+	{
+		bComboAttackTriggered = true;
 	}
 }
 
@@ -177,8 +181,24 @@ void AHeroCharacter::Dodge()
 	}
 }
 
+void AHeroCharacter::OnAttackComboBegin()
+{
+	bComboAttackWindowOpened = true;
+}
+
+void AHeroCharacter::OnAttackComboEnd(const FName NextAttackSectionName)
+{
+	bComboAttackWindowOpened = false;
+	if (bComboAttackTriggered)
+	{
+		PlayAnimMontage(AttackMontage, 1, NextAttackSectionName);
+		bComboAttackTriggered = false;
+	}
+}
+
 void AHeroCharacter::OnAttackEnd()
 {
+	StopAnimMontage(AttackMontage);
 	ActionState = EActionState::EAS_Idle;
 }
 

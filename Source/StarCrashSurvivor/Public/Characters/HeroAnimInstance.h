@@ -16,6 +16,10 @@ class STARCRASHSURVIVOR_API UHeroAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 protected:
 	UFUNCTION(BlueprintCallable)
+	void OnAttackComboBegin();
+	UFUNCTION(BlueprintCallable)
+	void OnAttackComboEnd(FName NextAttackSectionName);
+	UFUNCTION(BlueprintCallable)
 	void OnAttackEnd();
 	UFUNCTION(BlueprintCallable)
 	void OnHideWeaponAttachToSocket();

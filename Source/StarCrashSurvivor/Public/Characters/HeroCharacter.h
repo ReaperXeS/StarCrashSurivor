@@ -103,6 +103,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ActionDodge;
 
+	/*********************************************/
+	/* Combo Attack
+	 *********************************************/
+	bool bComboAttackWindowOpened = false;
+	bool bComboAttackTriggered = false;
 private:
 	/**
 	 * Movement functions
@@ -139,6 +144,8 @@ public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 
+	virtual void OnAttackComboBegin();
+	virtual void OnAttackComboEnd(FName NextAttackSectionName);
 	virtual void OnAttackEnd() override;
 	virtual void OnDodgeEnd() override;
 	void OnEquipEnd();

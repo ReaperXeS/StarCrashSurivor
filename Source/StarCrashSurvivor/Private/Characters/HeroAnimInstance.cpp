@@ -6,6 +6,22 @@
 #include "Characters/HeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+void UHeroAnimInstance::OnAttackComboBegin()
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->OnAttackComboBegin();
+	}
+}
+
+void UHeroAnimInstance::OnAttackComboEnd(const FName NextAttackSectionName)
+{
+	if (HeroCharacter && GetCurrentActiveMontage())
+	{
+		HeroCharacter->OnAttackComboEnd(NextAttackSectionName);
+	}
+}
+
 void UHeroAnimInstance::OnAttackEnd()
 {
 	if (HeroCharacter)
