@@ -74,24 +74,22 @@ void AHeroCharacter::BeginPlay()
 	}
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetStaminaAttribute()).AddUObject(this, &AHeroCharacter::StaminaChanged);
 	InitializeHeroOverlay();
+}
+
+void AHeroCharacter::StaminaChanged(const FOnAttributeChangeData& Data)
+{
+	if (HeroOverlay)
+	{
+		HeroOverlay->SetStaminaBarPercent(Data.NewValue / AttributeSet->GetMaxStamina());
+	}
 }
 
 // Called every frame
 void AHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (AttributesComponent && HeroOverlay)
-	{
-		AttributesComponent->RegenStamina(DeltaTime);
-		HeroOverlay->SetStaminaBarPercent(AttributesComponent->GetStaminaPercent());
-	}
-
-	if (AttributeSet)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Stamina: %f"), AttributeSet->GetStamina()));
-	}
 }
 
 // Called to bind functionality to input
@@ -151,11 +149,6 @@ void AHeroCharacter::AddGold(ATreasure* Treasure)
 		AttributesComponent->AddGold(Treasure->GetGold());
 		HeroOverlay->SetGold(AttributesComponent->GetGold());
 	}
-}
-
-bool AHeroCharacter::CanAttack() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
 }
 
 void AHeroCharacter::Attack()
@@ -267,53 +260,10 @@ void AHeroCharacter::MoveRight(const float AxisValue)
 	}
 }
 
-void AHeroCharacter::Interact()
-{
-	if (AWeapon* Weapon = Cast<AWeapon>(OverlappingItem); Weapon && CanPickupWeapon())
-	{
-		// TODO: Drop current weapon
-
-		// Attach new weapon
-		Weapon->Equip(GetMesh(), "Socket_RightHand", true, this);
-		CharacterState = ECharacterState::ECS_EquippedOneHanded;
-		EquippedWeapon = Weapon;
-		OverlappingItem = nullptr;
-		AbilitySystemComponent->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("NoWeapon")));
-	}
-	else if (CanHideWeapon())
-	{
-		PlayAnimMontage(EquipMontage, 1, "UnEquip");
-		ActionState = EActionState::EAS_Equipping;
-		CharacterState = ECharacterState::ECS_UnEquipped;
-	}
-	else if (CanShowWeapon())
-	{
-		// Attach new weapon
-		PlayAnimMontage(EquipMontage, 1, "Equip");
-		ActionState = EActionState::EAS_Equipping;
-		CharacterState = ECharacterState::ECS_EquippedOneHanded;
-	}
-}
-
 void AHeroCharacter::ZoomCamera(const FInputActionValue& ActionValue)
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + ActionValue.Get<float>() * 20.f, 100.f, 500.f);
 	// CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - 20.f, 100.f, 500.f);
-}
-
-bool AHeroCharacter::CanShowWeapon() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped && EquippedWeapon;
-}
-
-bool AHeroCharacter::CanHideWeapon() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState != ECharacterState::ECS_UnEquipped && EquippedWeapon;
-}
-
-bool AHeroCharacter::CanPickupWeapon() const
-{
-	return ActionState == EActionState::EAS_Idle && CharacterState == ECharacterState::ECS_UnEquipped;
 }
 
 void AHeroCharacter::InitializeHeroOverlay()

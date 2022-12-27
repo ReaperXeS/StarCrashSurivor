@@ -8,6 +8,7 @@
 #include "InputAction.h"
 #include "Interfaces/PickupInterface.h"
 #include "AbilitySystemInterface.h"
+#include "Abilities/HeroAttributeSet.h"
 #include "HeroCharacter.generated.h"
 
 class UBaseGameplayAbility;
@@ -56,6 +57,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/********************************************/
+	/*				Abilities					*/
+	/********************************************/
+	void StaminaChanged(const FOnAttributeChangeData& Data);
+
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent;
@@ -84,6 +90,7 @@ protected:
 	/*** 
 	 * States
 	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "States")
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	EActionState ActionState = EActionState::EAS_Idle;
 
@@ -124,18 +131,8 @@ private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 
-	/*
-	 * Action Mapping
-	 * */
-	void Interact();
-	void EKeyPressed();
-
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
-
-	bool CanShowWeapon() const;
-	bool CanHideWeapon() const;
-	bool CanPickupWeapon() const;
 
 	/*****
 	 * HUD
