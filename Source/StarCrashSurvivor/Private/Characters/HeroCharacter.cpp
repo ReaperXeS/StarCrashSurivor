@@ -157,19 +157,6 @@ void AHeroCharacter::Attack()
 	{
 		AbilitySystemComponent->AbilityLocalInputPressed(AttackLightAbility.GetDefaultObject()->GetInputId());
 	}
-	// if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Attack"))) && bComboAttackWindowOpened)
-	// {
-	// 	bComboAttackTriggered = true;
-	// }
-	// if (CanAttack())
-	// {
-	// 	PlayAnimMontage(AttackMontage);
-	// 	ActionState = EActionState::EAS_Attacking;
-	// }
-	// else if (ActionState == EActionState::EAS_Attacking && bComboAttackWindowOpened)
-	// {
-	// 	bComboAttackTriggered = true;
-	// }
 }
 
 void AHeroCharacter::ActionInputWithAbility(const FInputActionInstance& InputActionInstance)

@@ -94,7 +94,6 @@ protected:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	EActionState ActionState = EActionState::EAS_Idle;
 
-	virtual bool CanAttack() const override;
 	virtual void Attack() override;
 
 	/**

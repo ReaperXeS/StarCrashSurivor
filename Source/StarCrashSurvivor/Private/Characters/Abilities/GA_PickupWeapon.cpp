@@ -26,16 +26,11 @@ bool UGA_PickupWeapon::CanActivateAbility(const FGameplayAbilitySpecHandle Handl
 	return false;
 }
 
-void UGA_PickupWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_PickupWeapon::EquipWeapon()
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	// Attach new weapon
-	if (AHeroCharacter* Character = GetHeroCharacter(); Character && Character->GetOverlappingWeapon() && GetAbilitySystemComponentFromActorInfo())
+	if (AHeroCharacter* Character = GetHeroCharacter(); Character && Character->GetOverlappingWeapon())
 	{
 		Character->EquipWeapon(Character->GetOverlappingWeapon());
-		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("NoWeapon")));
 	}
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }

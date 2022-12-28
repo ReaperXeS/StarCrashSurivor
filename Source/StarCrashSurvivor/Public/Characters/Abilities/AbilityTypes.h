@@ -8,4 +8,5 @@ enum class EGameplayAbilityInput : uint8
 	EGAI_Dodge UMETA(DisplayName = "Dodge"),
 	EGAI_Interact UMETA(DisplayName = "Interact"),
 	EGAI_Jump UMETA(DisplayName = "Jump"),
+	EGAI_ShowHideWeapon UMETA(DisplayName = "ShowHideWeapon"),
 };
