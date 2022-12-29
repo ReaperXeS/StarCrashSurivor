@@ -31,7 +31,7 @@ class UAbilitySystemComponent;
 class UHeroAttributeSet;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -90,8 +90,6 @@ protected:
 	/*** 
 	 * States
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "States")
-	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	EActionState ActionState;
 
 	virtual void Attack() override;
@@ -142,12 +140,18 @@ private:
 	void InitializeHeroOverlay();
 
 public:
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE AItem* GetOverlappingItem() const { return OverlappingItem; }
 	AWeapon* GetOverlappingWeapon() const;
 
-	virtual
-	FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
+	/**
+	 * Get any owned gameplay tags on the asset
+	 * 
+	 * @param TagContainer	[OUT] Set of tags on the asset
+	 */
+	UFUNCTION(BlueprintCallable, Category = GameplayTags)
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+
+	virtual FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 
 
 	virtual void OnAttackComboBegin();

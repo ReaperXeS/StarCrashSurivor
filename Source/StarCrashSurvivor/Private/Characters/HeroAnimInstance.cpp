@@ -77,8 +77,19 @@ void UHeroAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (HeroCharacter)
 	{
-		CharacterState = HeroCharacter->GetCharacterState();
 		DeathState = HeroCharacter->GetDeathState();
 		IsDead = HeroCharacter->IsDead();
+	}
+}
+
+void UHeroAnimInstance::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->GetOwnedGameplayTags(TagContainer);
+	}
+	else
+	{
+		TagContainer = FGameplayTagContainer();
 	}
 }

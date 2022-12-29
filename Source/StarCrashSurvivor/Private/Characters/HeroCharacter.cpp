@@ -179,6 +179,18 @@ AWeapon* AHeroCharacter::GetOverlappingWeapon() const
 	return Cast<AWeapon>(OverlappingItem);
 }
 
+void AHeroCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+	}
+	else
+	{
+		TagContainer = FGameplayTagContainer();
+	}
+}
+
 void AHeroCharacter::OnAttackComboBegin()
 {
 	bComboAttackWindowOpened = true;
@@ -281,7 +293,6 @@ void AHeroCharacter::EquipWeapon(AWeapon* Weapon)
 	{
 		// Attach new weapon
 		Weapon->Equip(GetMesh(), "Socket_RightHand", true, this);
-		CharacterState = ECharacterState::ECS_EquippedOneHanded;
 		EquippedWeapon = Weapon;
 		OverlappingItem = nullptr;
 	}
