@@ -26,6 +26,7 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void DirectionalHitReact(const FVector& ImpactPoint);
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -86,12 +87,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetRotationWarpTarget();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
-
-	UFUNCTION(BlueprintCallable, Category = "Combat")
-	virtual void OnDodgeEnd();
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;

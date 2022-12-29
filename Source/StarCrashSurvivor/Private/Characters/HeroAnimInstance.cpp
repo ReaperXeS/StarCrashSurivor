@@ -22,14 +22,6 @@ void UHeroAnimInstance::OnAttackComboEnd(const FName NextAttackSectionName)
 	}
 }
 
-void UHeroAnimInstance::OnAttackEnd()
-{
-	if (HeroCharacter)
-	{
-		HeroCharacter->OnAttackEnd();
-	}
-}
-
 void UHeroAnimInstance::OnHideWeaponAttachToSocket()
 {
 	if (HeroCharacter)
@@ -46,27 +38,11 @@ void UHeroAnimInstance::OnShowWeaponAttachToSocket()
 	}
 }
 
-void UHeroAnimInstance::OnEquipEnd() const
-{
-	if (HeroCharacter)
-	{
-		HeroCharacter->OnEquipEnd();
-	}
-}
-
 void UHeroAnimInstance::EnableWeaponCollision()
 {
 	if (HeroCharacter)
 	{
 		HeroCharacter->UpdateWeaponCollision(ECollisionEnabled::QueryOnly);
-	}
-}
-
-void UHeroAnimInstance::OnHitReactEnd()
-{
-	if (HeroCharacter)
-	{
-		HeroCharacter->OnHitReactEnd();
 	}
 }
 

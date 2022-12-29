@@ -92,7 +92,7 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "States")
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
-	EActionState ActionState = EActionState::EAS_Idle;
+	EActionState ActionState;
 
 	virtual void Attack() override;
 
@@ -152,11 +152,7 @@ public:
 
 	virtual void OnAttackComboBegin();
 	virtual void OnAttackComboEnd(FName NextAttackSectionName);
-	virtual void OnAttackEnd() override;
-	virtual void OnDodgeEnd() override;
-	void OnEquipEnd();
 	void OnHideWeaponAttachToSocket();
-	void OnHitReactEnd();
 	void OnShowWeaponAttachToSocket();
 
 	void EquipWeapon(AWeapon* Weapon);

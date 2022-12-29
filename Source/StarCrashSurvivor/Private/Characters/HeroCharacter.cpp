@@ -194,19 +194,6 @@ void AHeroCharacter::OnAttackComboEnd(const FName NextAttackSectionName)
 	}
 }
 
-void AHeroCharacter::OnAttackEnd()
-{
-	StopAnimMontage(AttackMontage);
-	ActionState = EActionState::EAS_Idle;
-}
-
-void AHeroCharacter::OnDodgeEnd()
-{
-	Super::OnDodgeEnd();
-
-	ActionState = EActionState::EAS_Idle;
-}
-
 void AHeroCharacter::LookAround(const FInputActionValue& ActionValue)
 {
 	// Lookup
@@ -216,7 +203,7 @@ void AHeroCharacter::LookAround(const FInputActionValue& ActionValue)
 
 void AHeroCharacter::MoveCharacter(const FInputActionValue& ActionValue)
 {
-	if (ActionState == EActionState::EAS_Idle && Controller)
+	if (Controller)
 	{
 		MoveForward(ActionValue.Get<FVector2d>().Y);
 		MoveRight(ActionValue.Get<FVector2d>().X);
@@ -225,7 +212,7 @@ void AHeroCharacter::MoveCharacter(const FInputActionValue& ActionValue)
 
 void AHeroCharacter::MoveForward(const float AxisValue)
 {
-	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
+	if (Controller && AxisValue != 0)
 	{
 		// Move Forward where we look
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -237,7 +224,7 @@ void AHeroCharacter::MoveForward(const float AxisValue)
 
 void AHeroCharacter::MoveRight(const float AxisValue)
 {
-	if (ActionState == EActionState::EAS_Idle && Controller && AxisValue != 0)
+	if (Controller && AxisValue != 0)
 	{
 		// Move Right from direction we are looking
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -271,22 +258,12 @@ void AHeroCharacter::InitializeHeroOverlay()
 	}
 }
 
-void AHeroCharacter::OnEquipEnd()
-{
-	ActionState = EActionState::EAS_Idle;
-}
-
 void AHeroCharacter::OnHideWeaponAttachToSocket()
 {
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->Equip(GetMesh(), "BackWeaponHolder", false, this);
 	}
-}
-
-void AHeroCharacter::OnHitReactEnd()
-{
-	ActionState = EActionState::EAS_Idle;
 }
 
 void AHeroCharacter::OnShowWeaponAttachToSocket()

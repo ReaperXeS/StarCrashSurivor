@@ -14,28 +14,23 @@ UCLASS()
 class STARCRASHSURVIVOR_API UHeroAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
+
 protected:
 	UFUNCTION(BlueprintCallable)
 	void OnAttackComboBegin();
 	UFUNCTION(BlueprintCallable)
 	void OnAttackComboEnd(FName NextAttackSectionName);
 	UFUNCTION(BlueprintCallable)
-	void OnAttackEnd();
-	UFUNCTION(BlueprintCallable)
 	void OnHideWeaponAttachToSocket();
 	UFUNCTION(BlueprintCallable)
 	void OnShowWeaponAttachToSocket();
-	UFUNCTION(BlueprintCallable)
-	void OnEquipEnd() const;
 
 	UFUNCTION(BlueprintCallable)
 	void EnableWeaponCollision();
 
 	UFUNCTION(BlueprintCallable)
-	void OnHitReactEnd();
-
-	UFUNCTION(BlueprintCallable)
 	void DisableWeaponCollision();
+
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
