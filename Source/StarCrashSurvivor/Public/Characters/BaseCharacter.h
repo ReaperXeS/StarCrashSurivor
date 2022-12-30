@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "CharacterTypes.h"
+#include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
 #include "BaseCharacter.generated.h"
 
 // Forward Declarations
 class AWeapon;
-class UAttributesComponent;
+class UAbilitySystemComponent;
+class UBaseGameplayAbility;
+class UGameplayEffect;
+class UHeroAttributeSet;
 
 UCLASS()
-class STARCRASHSURVIVOR_API ABaseCharacter : public ACharacter, public IHitInterface
+class STARCRASHSURVIVOR_API ABaseCharacter : public ACharacter, public IHitInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -25,13 +29,32 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void DirectionalHitReact(const FVector& ImpactPoint);
+	UFUNCTION(BlueprintCallable)
+	FName ComputeDirectionalHitSection(const FVector& ImpactPoint) const;
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UAttributesComponent* AttributesComponent;
+	/********************************************/
+	/*				Abilities					*/
+	/********************************************/
+
+	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	const UHeroAttributeSet* AttributeSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<UBaseGameplayAbility> AttackLightAbility;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<UBaseGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> DamageEffect;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AWeapon* EquippedWeapon;
@@ -89,6 +112,14 @@ protected:
 	FVector GetRotationWarpTarget();
 
 public:
+	/**
+	 * Get any owned gameplay tags on the asset
+	 * 
+	 * @param TagContainer	[OUT] Set of tags on the asset
+	 */
+	UFUNCTION(BlueprintCallable, Category = GameplayTags)
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void OnAttackEnd();
 

@@ -6,13 +6,11 @@
 #include "Items/Soul.h"
 #include "AIController.h"
 #include "Characters/HeroCharacter.h"
-#include "Components/AttributesComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Items/Weapons/Weapon.h"
-#include "Kismet/GameplayStatics.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Math/UnrealMathUtility.h"
 
@@ -55,9 +53,12 @@ void AEnemy::BeginPlay()
 
 	if (HealthBarWidget)
 	{
-		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
+		HealthBarWidget->SetHealthPercent(AttributeSet->GetHealth() / AttributeSet->GetMaxHealth());
 		UpdateHealthBarWidgetVisibility(false);
 	}
+
+	check(AbilitySystemComponent);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &AEnemy::AttributeChanged);
 
 	GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
 
@@ -77,6 +78,14 @@ void AEnemy::BeginPlay()
 		SpawnParams.Instigator = this;
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnParams);
 		EquippedWeapon->Equip(GetMesh(), "WeaponSocket", true, this);
+	}
+}
+
+void AEnemy::AttributeChanged(const FOnAttributeChangeData& Data)
+{
+	if (HealthBarWidget && AttributeSet->GetHealthAttribute() == Data.Attribute)
+	{
+		HealthBarWidget->SetHealthPercent(Data.NewValue / AttributeSet->GetMaxHealth());
 	}
 }
 
@@ -186,11 +195,6 @@ float AEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AControl
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	if (AttributesComponent && HealthBarWidget)
-	{
-		HealthBarWidget->SetHealthPercent(AttributesComponent->GetHealthPercent());
-	}
-
 	if (EventInstigator)
 	{
 		CombatTarget = EventInstigator->GetPawn();
@@ -229,13 +233,13 @@ AActor* AEnemy::ComputeNewPatrolTarget()
 
 void AEnemy::SpawnSoul()
 {
-	if (SoulClass && AttributesComponent)
+	if (SoulClass && AttributeSet)
 	{
 		// Spawn soul above enemy
 		if (ASoul* Soul = GetWorld()->SpawnActor<ASoul>(SoulClass, GetActorLocation() + FVector(0.f, 0.f, 125.f), GetActorRotation()))
 		{
 			Soul->SetOwner(this);
-			Soul->SetSouls(AttributesComponent->GetSouls());
+			Soul->SetSouls(AttributeSet->GetSouls());
 		}
 	}
 }

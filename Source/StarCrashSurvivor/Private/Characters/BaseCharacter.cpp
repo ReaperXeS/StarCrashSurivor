@@ -4,18 +4,19 @@
 #include "Characters/BaseCharacter.h"
 
 #include "Characters/CharacterTypes.h"
-#include "Components/AttributesComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Items/Weapons/Weapon.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameplayCueFunctionLibrary.h"
+#include "ScalableFloat.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayAbilities/Public/Abilities/GameplayAbility.h"
+#include "Characters/Abilities/HeroAttributeSet.h"
 
 ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	AttributesComponent = CreateDefaultSubobject<UAttributesComponent>("Attributes");
 
 	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -24,12 +25,16 @@ ABaseCharacter::ABaseCharacter()
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 }
 
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
@@ -99,6 +104,11 @@ FVector ABaseCharacter::GetRotationWarpTarget()
 	return FVector();
 }
 
+void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	TagContainer = FGameplayTagContainer();
+}
+
 void ABaseCharacter::OnAttackEnd()
 {
 }
@@ -124,29 +134,29 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	if (AttributesComponent && AttributesComponent->IsAlive() && Hitter)
-	{
-		DirectionalHitReact(Hitter->GetActorLocation());
-	}
-	else
+	if (AttributeSet && AttributeSet->GetHealth() <= 0.0f)
 	{
 		Die();
+	}
+	else if (Hitter)
+	{
+		DirectionalHitReact(Hitter->GetActorLocation());
 	}
 
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 
-	if (HitSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
-	}
-
-	if (HitParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, ImpactPoint);
-	}
+	FGameplayCueParameters CueParameters;
+	CueParameters.Instigator = Hitter;
+	CueParameters.Location = ImpactPoint;
+	UGameplayCueFunctionLibrary::ExecuteGameplayCueOnActor(this, FGameplayTag::RequestGameplayTag("GameplayCue.DamageTaken"), CueParameters);
 }
 
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	PlayAnimMontage(HitReactMontage, 1, ComputeDirectionalHitSection(ImpactPoint));
+}
+
+FName ABaseCharacter::ComputeDirectionalHitSection(const FVector& ImpactPoint) const
 {
 	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
 	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal();
@@ -177,30 +187,29 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 		DrawDebugSphere(GetWorld(), ImpactPoint, 8.0f, 12, FColor::Red, false, 5.0f);
 	}
 
-	FName Section = "FromBack";
 	if (Theta >= -45.f && Theta < 45.f)
 	{
-		Section = "FromFront";
+		return FName("FromFront");
 	}
-	else if (Theta >= -135.f && Theta < -45.f)
+	if (Theta >= -135.f && Theta < -45.f)
 	{
-		Section = "FromLeft";
+		return FName("FromLeft");
 	}
-	else if (Theta >= 45.f && Theta < 135.f)
+	if (Theta >= 45.f && Theta < 135.f)
 	{
-		Section = "FromRight";
+		return FName("FromRight");
 	}
-
-	PlayAnimMontage(HitReactMontage, 1, Section);
+	return FName("FromBack");
 }
 
 float ABaseCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	if (AttributesComponent)
+	if (DamageEffect)
 	{
-		AttributesComponent->ReceiveDamage(Damage);
+		DamageEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(-Damage);
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(DamageEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
 	}
 	return Damage;
 }

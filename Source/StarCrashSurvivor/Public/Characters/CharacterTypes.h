@@ -5,12 +5,6 @@ inline FName C_TAG_ENEMY = FName("Enemy");
 inline FName C_TAG_HERO = FName("HERO");
 
 UENUM(BlueprintType)
-enum class EActionState : uint8
-{
-	EAS_HitReaction UMETA(DisplayName = "HitReaction"),
-};
-
-UENUM(BlueprintType)
 enum EDeathState
 {
 	EDS_Death1 UMETA(DisplayName = "Death 1"),

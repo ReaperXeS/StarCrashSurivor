@@ -50,6 +50,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData MaxStamina;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData Souls;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData Gold;
+
 public:
 	//~ Helper functions for "Health" attributes
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Health);
@@ -60,4 +66,10 @@ public:
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Stamina);
 
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, MaxStamina);
+
+	// Souls
+	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Souls);
+
+	// Gold
+	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Gold);
 };

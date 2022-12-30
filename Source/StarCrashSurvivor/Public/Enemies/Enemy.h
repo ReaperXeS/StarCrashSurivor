@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
 #include "Characters/CharacterTypes.h"
+#include "Characters/Abilities/HeroAttributeSet.h"
 #include "Enemy.generated.h"
 
 
@@ -29,6 +30,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,6 +43,11 @@ protected:
 
 	virtual void Attack() override;
 	virtual void OnAttackEnd() override;
+
+	/********************************************/
+	/*				Abilities					*/
+	/********************************************/
+	void AttributeChanged(const FOnAttributeChangeData& Data);
 
 	/**
 	 * States

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
-#include "CharacterTypes.h"
 #include "InputAction.h"
 #include "Interfaces/PickupInterface.h"
 #include "AbilitySystemInterface.h"
@@ -26,12 +25,11 @@ class UAnimMontage;
 class ATreasure;
 class ASoul;
 class UInputAction;
-class UInputMappingContext;
 class UAbilitySystemComponent;
 class UHeroAttributeSet;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface, public IGameplayTagAssetInterface
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -49,9 +47,13 @@ public:
 
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	/********************************************/
+	/*				IPickupInterface			*/
+	/********************************************/
 	virtual void SetOverlappingItem(AItem* Item) override;
-	virtual void AddGold(ATreasure* Treasure) override;
-	virtual void AddSouls(ASoul* Soul) override;
+
+	virtual void AddGold(class ATreasure* Treasure) override;
+	virtual void AddSouls(class ASoul* Soul) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -60,20 +62,14 @@ protected:
 	/********************************************/
 	/*				Abilities					*/
 	/********************************************/
-	void StaminaChanged(const FOnAttributeChangeData& Data);
+	void AttributeChanged(const FOnAttributeChangeData& Data);
 
-	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	UAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> SoulEffect;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	const UHeroAttributeSet* AttributeSet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> TreasureEffect;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TSubclassOf<UBaseGameplayAbility> AttackLightAbility;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TArray<TSubclassOf<UBaseGameplayAbility>> StartupAbilities;
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
@@ -86,11 +82,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UGroomComponent* EyeBrows;
-
-	/*** 
-	 * States
-	 */
-	EActionState ActionState;
 
 	virtual void Attack() override;
 
@@ -148,7 +139,6 @@ public:
 	 * 
 	 * @param TagContainer	[OUT] Set of tags on the asset
 	 */
-	UFUNCTION(BlueprintCallable, Category = GameplayTags)
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	virtual FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }

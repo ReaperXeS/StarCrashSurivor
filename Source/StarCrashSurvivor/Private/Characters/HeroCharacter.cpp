@@ -7,7 +7,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
-#include "Components/AttributesComponent.h"
 #include "HUD/HeroOverlay.h"
 #include "HUD/StarCrashSurvivorHUD.h"
 #include "Items/Soul.h"
@@ -46,17 +45,7 @@ AHeroCharacter::AHeroCharacter()
 	EyeBrows->SetupAttachment(GetMesh());
 	EyeBrows->AttachmentName = FString("head");
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AttributeSet = CreateDefaultSubobject<UHeroAttributeSet>(TEXT("AttributeSet"));
-}
-
-void AHeroCharacter::AddSouls(ASoul* Soul)
-{
-	if (AttributesComponent && Soul)
-	{
-		AttributesComponent->AddSouls(Soul->GetSouls());
-		HeroOverlay->SetSoul(AttributesComponent->GetSouls());
-	}
+	// AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -72,17 +61,35 @@ void AHeroCharacter::BeginPlay()
 			InputSystem->AddMappingContext(HeroMappingContext, 0);
 		}
 	}
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetStaminaAttribute()).AddUObject(this, &AHeroCharacter::StaminaChanged);
+
+	check(AbilitySystemComponent);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetStaminaAttribute()).AddUObject(this, &AHeroCharacter::AttributeChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &AHeroCharacter::AttributeChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetSoulsAttribute()).AddUObject(this, &AHeroCharacter::AttributeChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetGoldAttribute()).AddUObject(this, &AHeroCharacter::AttributeChanged);
 	InitializeHeroOverlay();
 }
 
-void AHeroCharacter::StaminaChanged(const FOnAttributeChangeData& Data)
+void AHeroCharacter::AttributeChanged(const FOnAttributeChangeData& Data)
 {
 	if (HeroOverlay)
 	{
-		HeroOverlay->SetStaminaBarPercent(Data.NewValue / AttributeSet->GetMaxStamina());
+		if (AttributeSet->GetStaminaAttribute() == Data.Attribute)
+		{
+			HeroOverlay->SetStaminaBarPercent(Data.NewValue / AttributeSet->GetMaxStamina());
+		}
+		else if (AttributeSet->GetHealthAttribute() == Data.Attribute)
+		{
+			HeroOverlay->SetHealthBarPercent(Data.NewValue / AttributeSet->GetMaxHealth());
+		}
+		else if (AttributeSet->GetSoulsAttribute() == Data.Attribute)
+		{
+			HeroOverlay->SetSoul(Data.NewValue);
+		}
+		else if (AttributeSet->GetGoldAttribute() == Data.Attribute)
+		{
+			HeroOverlay->SetGold(Data.NewValue);
+		}
 	}
 }
 
@@ -121,18 +128,15 @@ void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 	if (!IsDead())
 	{
-		ActionState = EActionState::EAS_HitReaction;
+		FGameplayTagContainer TagContainer;
+		GetOwnedGameplayTags(TagContainer);
+		TagContainer.AddTag(FGameplayTag::RequestGameplayTag("ActionState.HitReaction"));
 	}
 }
 
 float AHeroCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	const auto ReturnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	if (AttributesComponent && HeroOverlay)
-	{
-		HeroOverlay->SetHealthBarPercent(AttributesComponent->GetHealthPercent());
-	}
+	const float ReturnValue = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
 	return ReturnValue;
 }
@@ -144,10 +148,19 @@ void AHeroCharacter::SetOverlappingItem(AItem* Item)
 
 void AHeroCharacter::AddGold(ATreasure* Treasure)
 {
-	if (AttributesComponent && Treasure)
+	if (TreasureEffect && Treasure)
 	{
-		AttributesComponent->AddGold(Treasure->GetGold());
-		HeroOverlay->SetGold(AttributesComponent->GetGold());
+		TreasureEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(Treasure->GetGold());
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(TreasureEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
+	}
+}
+
+void AHeroCharacter::AddSouls(ASoul* Soul)
+{
+	if (SoulEffect && Soul)
+	{
+		SoulEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(Soul->GetSouls());
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(SoulEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
 	}
 }
 
