@@ -49,6 +49,11 @@ protected:
 	/********************************************/
 	void AttributeChanged(const FOnAttributeChangeData& Data);
 
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> AttackAbility;
+
+	FGameplayAbilitySpecHandle AttackAbilityHandle;
+
 	/**
 	 * States
 	 */

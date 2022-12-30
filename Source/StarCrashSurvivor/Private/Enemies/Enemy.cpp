@@ -59,6 +59,10 @@ void AEnemy::BeginPlay()
 
 	check(AbilitySystemComponent);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &AEnemy::AttributeChanged);
+	if (AttackAbility)
+	{
+		AttackAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AttackAbility));
+	}
 
 	GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
 
@@ -109,7 +113,9 @@ void AEnemy::Attack()
 	Super::Attack();
 	EnemyState = EEnemyState::EES_Engaged;
 
-	PlayAnimMontageRandomSection(AttackMontage);
+	FGameplayTagContainer TagContainer;
+
+	AbilitySystemComponent->TryActivateAbility(AttackAbilityHandle);
 }
 
 void AEnemy::OnAttackEnd()

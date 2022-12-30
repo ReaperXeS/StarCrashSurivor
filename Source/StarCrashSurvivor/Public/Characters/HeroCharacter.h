@@ -27,6 +27,7 @@ class ASoul;
 class UInputAction;
 class UAbilitySystemComponent;
 class UHeroAttributeSet;
+class UInputMappingContext;
 
 UCLASS()
 class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface
@@ -133,13 +134,6 @@ private:
 public:
 	FORCEINLINE AItem* GetOverlappingItem() const { return OverlappingItem; }
 	AWeapon* GetOverlappingWeapon() const;
-
-	/**
-	 * Get any owned gameplay tags on the asset
-	 * 
-	 * @param TagContainer	[OUT] Set of tags on the asset
-	 */
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	virtual FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 

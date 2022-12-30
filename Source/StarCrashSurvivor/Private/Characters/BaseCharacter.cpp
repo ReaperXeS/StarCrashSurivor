@@ -106,7 +106,14 @@ FVector ABaseCharacter::GetRotationWarpTarget()
 
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
-	TagContainer = FGameplayTagContainer();
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+	}
+	else
+	{
+		TagContainer = FGameplayTagContainer();
+	}
 }
 
 void ABaseCharacter::OnAttackEnd()

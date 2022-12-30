@@ -22,8 +22,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	EGameplayAbilityInput InputId;
 
-	UGameplayAbility* GetAbilityFromInputID(EGameplayAbilityInput InputID);
-
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* InputAction;
 

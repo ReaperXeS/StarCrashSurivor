@@ -77,27 +77,17 @@ protected:
 	/***
 	 * Animation Montages
 	 */
+	UFUNCTION(BlueprintCallable, Category = "Animation")
 	uint8 PlayAnimMontageRandomSection(UAnimMontage* AnimMontage);
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* EquipMontage;
+	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* DodgeMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* HitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = "FX")
-	UParticleSystem* HitParticle;
 
 	UPROPERTY(EditAnywhere, Category = "Development")
 	bool bDebug = false;

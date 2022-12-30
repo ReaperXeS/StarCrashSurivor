@@ -192,18 +192,6 @@ AWeapon* AHeroCharacter::GetOverlappingWeapon() const
 	return Cast<AWeapon>(OverlappingItem);
 }
 
-void AHeroCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
-{
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
-	}
-	else
-	{
-		TagContainer = FGameplayTagContainer();
-	}
-}
-
 void AHeroCharacter::OnAttackComboBegin()
 {
 	bComboAttackWindowOpened = true;
