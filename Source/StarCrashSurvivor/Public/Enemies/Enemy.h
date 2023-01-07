@@ -26,28 +26,21 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void StartAttackTimer();
-	void ClearAttackTimer();
-	virtual bool CanAttack() const override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthBarComponent* HealthBarWidget;
 
-	virtual void Attack() override;
-	virtual void OnAttackEnd() override;
-
 	/********************************************/
 	/*				Abilities					*/
 	/********************************************/
-	void AttributeChanged(const FOnAttributeChangeData& Data);
+	void AttributeChanged(const FOnAttributeChangeData& Data) const;
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> AttackAbility;
@@ -57,17 +50,10 @@ protected:
 	/**
 	 * States
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
-
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	float DeathLifeSpan = 5.f;
 
 	virtual void Die_Implementation() override;
-
-	void UpdateEnemyState(const EEnemyState NewState, AActor* Target);
-
-	bool IsCombatTargetDead() const;
 
 	/**
 	 * AI
@@ -88,25 +74,19 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "AI")
 	AActor* CurrentPatrolTarget;
 
-	UPROPERTY(EditInstanceOnly, Category = "AI")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "AI")
 	TArray<AActor*> PatrolTargets;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	float PatrolWaitTimeMin = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	float PatrolWaitTimeMax = 8.f;
 
-	void MoveToTarget(const AActor* Target) const;
 	bool InTargetRange(const AActor* Target, double Radius) const;
 
-	FTimerHandle PatrolTimerHandle;
-	void ClearPatrolTimer();
-	void PatrolTimerFinished() const;
+	UFUNCTION(BlueprintCallable)
 	AActor* ComputeNewPatrolTarget();
-
-	void CheckCombatTarget();
-	void CheckCurrentPatrolTarget();
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;
@@ -126,12 +106,11 @@ protected:
 	/*****
 	 * Combat
 	 *****/
-	FTimerHandle AttackTimerHandle;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	// TODO: Should be Attributes set with Data Table
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float AttackMinRate = 0.5f;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float AttackMaxRate = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -139,11 +118,17 @@ protected:
 
 	void SpawnSoul();
 
-private:
+	UFUNCTION(BlueprintCallable)
 	void UpdateHealthBarWidgetVisibility(const bool bVisible) const;
-	bool IsOutsideCombatRadius() const;
+
+	void UpdateCombatTarget(AActor* NewTarget);
 
 public:
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Destroyed() override;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsOutsideCombatRadius() const;
+
+	void CheckCombatTarget();
 };

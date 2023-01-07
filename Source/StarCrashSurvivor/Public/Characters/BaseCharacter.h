@@ -111,13 +111,11 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	virtual void OnAttackEnd();
-
-	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UpdateWeaponCollision(ECollisionEnabled::Type NewCollisionEnabled) const;
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool IsDead() const;
 
 	FORCEINLINE EDeathState GetDeathState() const { return DeathState; }
+	FORCEINLINE AActor* GetCombatTarget() const { return CombatTarget; }
 };

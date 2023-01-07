@@ -116,10 +116,6 @@ void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) c
 	}
 }
 
-void ABaseCharacter::OnAttackEnd()
-{
-}
-
 void ABaseCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewCollisionEnabled) const
 {
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
