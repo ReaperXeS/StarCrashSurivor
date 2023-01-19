@@ -7,6 +7,7 @@
 #include "Characters/HeroCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Enemies/BaseEnemyAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Items/Weapons/Weapon.h"
@@ -40,9 +41,12 @@ void AEnemy::BeginPlay()
 
 	if (HealthBarWidget)
 	{
+		// TODO: Crash here AttributeSet is null maybe??
 		HealthBarWidget->SetHealthPercent(AttributeSet->GetHealth() / AttributeSet->GetMaxHealth());
 		UpdateHealthBarWidgetVisibility(false);
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("MaxAggroDistance: %f"), EnemyAttributeSet->GetMaxAggroDistance());
 
 	check(AbilitySystemComponent);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &AEnemy::AttributeChanged);
@@ -73,6 +77,12 @@ void AEnemy::BeginPlay()
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnParams);
 		EquippedWeapon->Equip(GetMesh(), "WeaponSocket", true, this);
 	}
+}
+
+void AEnemy::InitializeAttributeSet()
+{
+	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
+	EnemyAttributeSet = Cast<UBaseEnemyAttributeSet>(AttributeSet);
 }
 
 void AEnemy::AttributeChanged(const FOnAttributeChangeData& Data) const

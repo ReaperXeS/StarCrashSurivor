@@ -40,6 +40,8 @@ protected:
 	/*				Abilities					*/
 	/********************************************/
 
+	virtual void InitializeAttributeSet();
+
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent;

@@ -34,8 +34,13 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
+	InitializeAttributeSet();
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
+}
+
+void ABaseCharacter::InitializeAttributeSet()
+{
+	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
 }
 
 bool ABaseCharacter::CanAttack() const

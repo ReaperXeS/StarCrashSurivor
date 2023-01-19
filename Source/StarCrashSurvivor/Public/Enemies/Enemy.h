@@ -9,6 +9,7 @@
 #include "Enemy.generated.h"
 
 
+class UBaseEnemyAttributeSet;
 class AAIController;
 class ASoul;
 class UAttributesComponent;
@@ -40,6 +41,11 @@ protected:
 	/********************************************/
 	/*				Abilities					*/
 	/********************************************/
+	virtual void InitializeAttributeSet() override;
+
+	UPROPERTY()
+	const UBaseEnemyAttributeSet* EnemyAttributeSet;
+
 	void AttributeChanged(const FOnAttributeChangeData& Data) const;
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
