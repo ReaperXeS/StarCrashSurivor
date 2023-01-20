@@ -69,9 +69,6 @@ protected:
 	float AttackDistance = 150.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-	float MaxAggroDistance = 1000.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
 	float PatrolRadius = 15.f;
 
 	UPROPERTY()

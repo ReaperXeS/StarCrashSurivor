@@ -212,7 +212,7 @@ void AEnemy::UpdateCombatTarget(AActor* NewTarget)
 
 bool AEnemy::IsOutsideCombatRadius() const
 {
-	return !InTargetRange(CombatTarget, MaxAggroDistance);
+	return !InTargetRange(CombatTarget, EnemyAttributeSet->GetMaxAggroDistance());
 }
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
