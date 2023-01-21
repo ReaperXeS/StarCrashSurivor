@@ -56,7 +56,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData Gold;
 
+	void ShowDebugOfAttribute(FGameplayAttribute Attribute) const;
+
 public:
+	virtual void ShowDebug() const;
+
 	//~ Helper functions for "Health" attributes
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Health);
 

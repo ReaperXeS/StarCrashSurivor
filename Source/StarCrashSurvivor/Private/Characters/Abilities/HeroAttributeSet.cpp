@@ -17,3 +17,24 @@ void UHeroAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
 	}
 }
+
+void UHeroAttributeSet::ShowDebugOfAttribute(const FGameplayAttribute Attribute) const
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::White, FString::Printf(TEXT("%s: %f"), *Attribute.AttributeName, Attribute.GetNumericValue(this)));
+	}
+}
+
+void UHeroAttributeSet::ShowDebug() const
+{
+	if (GEngine)
+	{
+		ShowDebugOfAttribute(GetGoldAttribute());
+		ShowDebugOfAttribute(GetHealthAttribute());
+		ShowDebugOfAttribute(GetMaxHealthAttribute());
+		ShowDebugOfAttribute(GetMaxStaminaAttribute());
+		ShowDebugOfAttribute(GetSoulsAttribute());
+		ShowDebugOfAttribute(GetStaminaAttribute());
+	}
+}

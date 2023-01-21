@@ -59,8 +59,7 @@ void AEnemy::BeginPlay()
 	}
 
 	// Set walk speed in patrolling walk speed
-	GetCharacterMovement()->MaxWalkSpeed = PatrollingWalkSpeed;
-
+	GetCharacterMovement()->MaxWalkSpeed = EnemyAttributeSet->GetPatrollingWalkSpeed();
 	// Set up the pawn sensing component
 	if (PawnSensingComponent)
 	{
@@ -83,6 +82,10 @@ void AEnemy::InitializeAttributeSet()
 {
 	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
 	EnemyAttributeSet = Cast<UBaseEnemyAttributeSet>(AttributeSet);
+	if (EnemyAttributeSet && DebugGAS)
+	{
+		EnemyAttributeSet->ShowDebug();
+	}
 }
 
 void AEnemy::AttributeChanged(const FOnAttributeChangeData& Data) const
@@ -97,7 +100,7 @@ void AEnemy::Die_Implementation()
 {
 	Super::Die_Implementation();
 
-	SetLifeSpan(DeathLifeSpan);
+	SetLifeSpan(EnemyAttributeSet->GetDeathLifeSpan());
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SpawnSoul();
@@ -207,7 +210,7 @@ void AEnemy::UpdateCombatTarget(AActor* NewTarget)
 {
 	CombatTarget = NewTarget;
 	UpdateHealthBarWidgetVisibility(CombatTarget != nullptr);
-	GetCharacterMovement()->MaxWalkSpeed = CombatTarget != nullptr ? ChasingWalkSpeed : PatrollingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CombatTarget != nullptr ? EnemyAttributeSet->GetChasingWalkSpeed() : EnemyAttributeSet->GetPatrollingWalkSpeed();
 }
 
 bool AEnemy::IsOutsideCombatRadius() const

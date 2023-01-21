@@ -41,9 +41,10 @@ protected:
 	/********************************************/
 	/*				Abilities					*/
 	/********************************************/
+
 	virtual void InitializeAttributeSet() override;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	const UBaseEnemyAttributeSet* EnemyAttributeSet;
 
 	void AttributeChanged(const FOnAttributeChangeData& Data) const;
@@ -56,21 +57,11 @@ protected:
 	/**
 	 * States
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "State")
-	float DeathLifeSpan = 5.f;
-
 	virtual void Die_Implementation() override;
 
 	/**
 	 * AI
 	 */
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float AttackDistance = 150.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float PatrolRadius = 15.f;
-
 	UPROPERTY()
 	AAIController* AIController;
 
@@ -79,12 +70,6 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "AI")
 	TArray<AActor*> PatrolTargets;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
-	float PatrolWaitTimeMin = 3.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
-	float PatrolWaitTimeMax = 8.f;
 
 	bool InTargetRange(const AActor* Target, double Radius) const;
 
@@ -97,25 +82,12 @@ protected:
 	UFUNCTION()
 	void PawnSeen(APawn* Pawn);
 
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float PatrollingWalkSpeed = 125.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float ChasingWalkSpeed = 300.f;
-
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> WeaponClass;
 
 	/*****
 	 * Combat
 	 *****/
-	// TODO: Should be Attributes set with Data Table
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	float AttackMinRate = 0.5f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	float AttackMaxRate = 1.f;
-
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<ASoul> SoulClass;
 

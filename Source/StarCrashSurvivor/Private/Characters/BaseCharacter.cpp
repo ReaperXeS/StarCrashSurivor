@@ -38,6 +38,15 @@ void ABaseCharacter::BeginPlay()
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
 }
 
+void ABaseCharacter::ShowDebugGAS() const
+{
+	if (AttributeSet && DebugGAS && GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("GAS for %s"), *GetActorNameOrLabel()));
+		AttributeSet->ShowDebug();
+	}
+}
+
 void ABaseCharacter::InitializeAttributeSet()
 {
 	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
@@ -133,6 +142,8 @@ void ABaseCharacter::UpdateWeaponCollision(const ECollisionEnabled::Type NewColl
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ShowDebugGAS();
 }
 
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

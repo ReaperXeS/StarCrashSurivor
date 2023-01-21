@@ -40,6 +40,11 @@ protected:
 	/*				Abilities					*/
 	/********************************************/
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	bool DebugGAS = false;
+
+	virtual void ShowDebugGAS() const;
+
 	virtual void InitializeAttributeSet();
 
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
