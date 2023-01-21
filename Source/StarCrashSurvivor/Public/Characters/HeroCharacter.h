@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
-#include "CharacterTypes.h"
 #include "InputAction.h"
 #include "Interfaces/PickupInterface.h"
+#include "AbilitySystemInterface.h"
+#include "Abilities/HeroAttributeSet.h"
 #include "HeroCharacter.generated.h"
 
+class UBaseGameplayAbility;
+class UGameplayAbility;
 /***
  * Forward Declarations
  */
@@ -22,10 +25,12 @@ class UAnimMontage;
 class ATreasure;
 class ASoul;
 class UInputAction;
+class UAbilitySystemComponent;
+class UHeroAttributeSet;
 class UInputMappingContext;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -41,16 +46,31 @@ public:
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
-	virtual void Jump() override;
-
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	/********************************************/
+	/*				IPickupInterface			*/
+	/********************************************/
 	virtual void SetOverlappingItem(AItem* Item) override;
-	virtual void AddGold(ATreasure* Treasure) override;
-	virtual void AddSouls(ASoul* Soul) override;
+
+	virtual void AddGold(class ATreasure* Treasure) override;
+	virtual void AddSouls(class ASoul* Soul) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/********************************************/
+	/*				Abilities					*/
+	/********************************************/
+	void AttributeChanged(const FOnAttributeChangeData& Data);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> SoulEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> TreasureEffect;
+
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
@@ -64,23 +84,15 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UGroomComponent* EyeBrows;
 
-	/*** 
-	 * States
-	 */
-	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
-	EActionState ActionState = EActionState::EAS_Idle;
-
-	virtual bool CanAttack() const override;
 	virtual void Attack() override;
-
-	bool CanDodge() const;
-	void Dodge();
 
 	/**
 	 * Input
 	 **/
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputMappingContext* HeroMappingContext;
+
+	void ActionInputWithAbility(const FInputActionInstance& InputActionInstance);
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ActionMove;
@@ -89,19 +101,13 @@ protected:
 	UInputAction* ActionLookAround;
 
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionJump;
-
-	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ActionZoomInOutCamera;
 
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionInteract;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionAttack;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionDodge;
+	/*********************************************/
+	/* Combo Attack
+	 *********************************************/
+	bool bComboAttackWindowOpened = false;
+	bool bComboAttackTriggered = false;
 
 private:
 	/**
@@ -114,18 +120,8 @@ private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 
-	/*
-	 * Action Mapping
-	 * */
-	void Interact();
-	void EKeyPressed();
-
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
-
-	bool CanShowWeapon() const;
-	bool CanHideWeapon() const;
-	bool CanPickupWeapon() const;
 
 	/*****
 	 * HUD
@@ -136,13 +132,16 @@ private:
 	void InitializeHeroOverlay();
 
 public:
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE AItem* GetOverlappingItem() const { return OverlappingItem; }
+	AWeapon* GetOverlappingWeapon() const;
+
+	virtual FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 
 
-	virtual void OnAttackEnd() override;
-	virtual void OnDodgeEnd() override;
-	void OnEquipEnd();
+	virtual void OnAttackComboBegin();
+	virtual void OnAttackComboEnd(FName NextAttackSectionName);
 	void OnHideWeaponAttachToSocket();
-	void OnHitReactEnd();
 	void OnShowWeaponAttachToSocket();
+
+	void EquipWeapon(AWeapon* Weapon);
 };

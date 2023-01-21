@@ -6,11 +6,19 @@
 #include "Characters/HeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-void UHeroAnimInstance::OnAttackEnd()
+void UHeroAnimInstance::OnAttackComboBegin()
 {
 	if (HeroCharacter)
 	{
-		HeroCharacter->OnAttackEnd();
+		HeroCharacter->OnAttackComboBegin();
+	}
+}
+
+void UHeroAnimInstance::OnAttackComboEnd(const FName NextAttackSectionName)
+{
+	if (HeroCharacter && GetCurrentActiveMontage())
+	{
+		HeroCharacter->OnAttackComboEnd(NextAttackSectionName);
 	}
 }
 
@@ -30,27 +38,11 @@ void UHeroAnimInstance::OnShowWeaponAttachToSocket()
 	}
 }
 
-void UHeroAnimInstance::OnEquipEnd() const
-{
-	if (HeroCharacter)
-	{
-		HeroCharacter->OnEquipEnd();
-	}
-}
-
 void UHeroAnimInstance::EnableWeaponCollision()
 {
 	if (HeroCharacter)
 	{
 		HeroCharacter->UpdateWeaponCollision(ECollisionEnabled::QueryOnly);
-	}
-}
-
-void UHeroAnimInstance::OnHitReactEnd()
-{
-	if (HeroCharacter)
-	{
-		HeroCharacter->OnHitReactEnd();
 	}
 }
 
@@ -85,8 +77,19 @@ void UHeroAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (HeroCharacter)
 	{
-		CharacterState = HeroCharacter->GetCharacterState();
 		DeathState = HeroCharacter->GetDeathState();
 		IsDead = HeroCharacter->IsDead();
+	}
+}
+
+void UHeroAnimInstance::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	if (HeroCharacter)
+	{
+		HeroCharacter->GetOwnedGameplayTags(TagContainer);
+	}
+	else
+	{
+		TagContainer = FGameplayTagContainer();
 	}
 }
