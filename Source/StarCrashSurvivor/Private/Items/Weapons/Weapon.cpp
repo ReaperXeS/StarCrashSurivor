@@ -80,8 +80,8 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		ActorsToIgnore.AddUnique(Actor);
 	}
 
-	FHitResult OutHit;
-	UKismetSystemLibrary::BoxTraceSingle(
+	TArray<FHitResult> OutHits;
+	UKismetSystemLibrary::BoxTraceMulti(
 		this,
 		BoxTraceStart->GetComponentLocation(),
 		BoxTraceEnd->GetComponentLocation(),
@@ -91,18 +91,21 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		false,
 		IgnoreActors,
 		bDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
-		OutHit,
+		OutHits,
 		true);
 
-	if (OutHit.GetActor())
+	for (auto Hit : OutHits)
 	{
-		if (const IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor()); !ActorIsSameType(OutHit.GetActor()) && HitInterface)
+		if (Hit.GetActor())
 		{
-			UGameplayStatics::ApplyDamage(OutHit.GetActor(), BaseDamage, GetOwner() ? GetOwner()->GetInstigatorController() : nullptr, this, UDamageType::StaticClass());
-			HitInterface->Execute_GetHit(OutHit.GetActor(), OutHit.ImpactPoint, GetOwner());
+			if (const IHitInterface* HitInterface = Cast<IHitInterface>(Hit.GetActor()); !ActorIsSameType(Hit.GetActor()) && HitInterface && IgnoreActors.Find(Hit.GetActor()) == INDEX_NONE)
+			{
+				UGameplayStatics::ApplyDamage(Hit.GetActor(), BaseDamage, GetOwner() ? GetOwner()->GetInstigatorController() : nullptr, this, UDamageType::StaticClass());
+				HitInterface->Execute_GetHit(Hit.GetActor(), Hit.ImpactPoint, GetOwner());
+			}
+			IgnoreActors.AddUnique(Hit.GetActor());
+			CreateFields(Hit.ImpactPoint);
 		}
-		IgnoreActors.AddUnique(OutHit.GetActor());
-		CreateFields(OutHit.ImpactPoint);
 	}
 }
 
