@@ -114,8 +114,11 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		for (TSubclassOf<UBaseGameplayAbility> StartupAbility : StartupAbilities)
 		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, 1, StartupAbility.GetDefaultObject()->GetInputId()));
-			Input->BindAction(StartupAbility.GetDefaultObject()->GetInputAction(), ETriggerEvent::Triggered, this, &AHeroCharacter::ActionInputWithAbility);
+			if (StartupAbility.GetDefaultObject())
+			{
+				AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, 1, StartupAbility.GetDefaultObject()->GetInputId()));
+				Input->BindAction(StartupAbility.GetDefaultObject()->GetInputAction(), ETriggerEvent::Triggered, this, &AHeroCharacter::ActionInputWithAbility);
+			}
 		}
 	}
 
