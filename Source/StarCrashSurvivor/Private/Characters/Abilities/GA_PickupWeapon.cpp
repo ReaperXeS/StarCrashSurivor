@@ -17,7 +17,7 @@ bool UGA_PickupWeapon::CanActivateAbility(const FGameplayAbilitySpecHandle Handl
 	{
 		if (const AActor* AvatarActor = ActorInfo ? ActorInfo->AvatarActor.Get() : nullptr)
 		{
-			if (const AHeroCharacter* HeroCharacter = Cast<AHeroCharacter>(AvatarActor); HeroCharacter && HeroCharacter->GetOverlappingWeapon())
+			if (const AHeroCharacter* HeroCharacter = Cast<AHeroCharacter>(AvatarActor); HeroCharacter && HeroCharacter->GetOverlappingItem())
 			{
 				return true;
 			}
@@ -29,8 +29,8 @@ bool UGA_PickupWeapon::CanActivateAbility(const FGameplayAbilitySpecHandle Handl
 void UGA_PickupWeapon::EquipWeapon()
 {
 	// Attach new weapon
-	if (AHeroCharacter* Character = GetHeroCharacter(); Character && Character->GetOverlappingWeapon())
+	if (AHeroCharacter* Character = GetHeroCharacter(); Character && Character->GetOverlappingItem())
 	{
-		Character->EquipWeapon(Character->GetOverlappingWeapon());
+		Character->EquipItem(Character->GetOverlappingItem());
 	}
 }
