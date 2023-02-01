@@ -316,11 +316,20 @@ void AHeroCharacter::EquipItem(AItem* Item)
 		Weapon->Equip(GetMesh(), Weapon->GetSocketName(), true, this);
 		EquippedWeapon = Weapon;
 		OverlappingItem = nullptr;
+
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.OneHand")));
+		}
 	}
 	else if (AShield* Shield = Cast<AShield>(Item))
 	{
 		// Attach new weapon
 		Shield->Equip(GetMesh(), Shield->GetSocketName(), true, this);
 		OverlappingItem = nullptr;
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Shield")));
+		}
 	}
 }
