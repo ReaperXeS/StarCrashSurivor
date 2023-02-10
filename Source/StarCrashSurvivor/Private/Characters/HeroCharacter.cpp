@@ -326,6 +326,7 @@ void AHeroCharacter::EquipItem(AItem* Item)
 	{
 		// Attach new weapon
 		Shield->Equip(GetMesh(), Shield->GetSocketName(), true, this);
+		EquippedShield = Shield;
 		OverlappingItem = nullptr;
 		if (GetAbilitySystemComponent())
 		{

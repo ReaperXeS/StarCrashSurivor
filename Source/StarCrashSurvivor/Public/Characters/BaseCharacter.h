@@ -7,9 +7,11 @@
 #include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Abilities/GameplayAbility.h"
 #include "BaseCharacter.generated.h"
 
 // Forward Declarations
+class AShield;
 class AWeapon;
 class UAbilitySystemComponent;
 class UBaseGameplayAbility;
@@ -65,6 +67,9 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AShield* EquippedShield;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	AActor* CombatTarget;

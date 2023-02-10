@@ -33,6 +33,7 @@ class STARCRASHSURVIVOR_API UHeroAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
+	// AttributeSet Overrides
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 protected:
@@ -60,6 +61,17 @@ protected:
 
 public:
 	virtual void ShowDebug() const;
+
+	// Damage is a meta attribute used by the DamageExecution to calculate final damage, which then turns into -Health
+	// Temporary value that only exists on the Server. Not replicated.
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Damage)
+
+	// Armor reduces the amount of damage done by attackers
+	UPROPERTY(BlueprintReadOnly, Category = "Armor")
+	FGameplayAttributeData Armor;
+	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Armor)
 
 	//~ Helper functions for "Health" attributes
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Health);
