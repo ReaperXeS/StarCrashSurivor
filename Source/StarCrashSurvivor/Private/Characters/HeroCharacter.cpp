@@ -18,6 +18,7 @@
 #include "GameplayAbilities/Public/Abilities/GameplayAbility.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
 #include "Characters/Abilities/BaseGameplayAbility.h"
+#include "Items/Shield.h"
 
 // Sets default values
 AHeroCharacter::AHeroCharacter()
@@ -117,7 +118,8 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			if (StartupAbility.GetDefaultObject())
 			{
 				AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, 1, StartupAbility.GetDefaultObject()->GetInputId()));
-				Input->BindAction(StartupAbility.GetDefaultObject()->GetInputAction(), ETriggerEvent::Triggered, this, &AHeroCharacter::ActionInputWithAbility);
+				Input->BindAction(StartupAbility.GetDefaultObject()->GetInputAction(), ETriggerEvent::Started, this, &AHeroCharacter::ActionInputWithAbilityPressed);
+				Input->BindAction(StartupAbility.GetDefaultObject()->GetInputAction(), ETriggerEvent::Completed, this, &AHeroCharacter::ActionInputWithAbilityReleased);
 			}
 		}
 	}
@@ -175,7 +177,7 @@ void AHeroCharacter::Attack()
 	}
 }
 
-void AHeroCharacter::ActionInputWithAbility(const FInputActionInstance& InputActionInstance)
+void AHeroCharacter::ActionInputWithAbilityPressed(const FInputActionInstance& InputActionInstance)
 {
 	if (StartupAbilities.Num() > 0)
 	{
@@ -184,6 +186,21 @@ void AHeroCharacter::ActionInputWithAbility(const FInputActionInstance& InputAct
 			if (InputActionInstance.GetSourceAction() == Ability.GetDefaultObject()->GetInputAction())
 			{
 				AbilitySystemComponent->AbilityLocalInputPressed(Ability.GetDefaultObject()->GetInputId());
+				break;
+			}
+		}
+	}
+}
+
+void AHeroCharacter::ActionInputWithAbilityReleased(const FInputActionInstance& InputActionInstance)
+{
+	if (StartupAbilities.Num() > 0)
+	{
+		for (TSubclassOf<UBaseGameplayAbility> Ability : StartupAbilities)
+		{
+			if (InputActionInstance.GetSourceAction() == Ability.GetDefaultObject()->GetInputAction())
+			{
+				AbilitySystemComponent->AbilityLocalInputReleased(Ability.GetDefaultObject()->GetInputId());
 				break;
 			}
 		}
@@ -291,13 +308,29 @@ void AHeroCharacter::OnShowWeaponAttachToSocket()
 	}
 }
 
-void AHeroCharacter::EquipWeapon(AWeapon* Weapon)
+void AHeroCharacter::EquipItem(AItem* Item)
 {
-	if (Weapon)
+	if (AWeapon* Weapon = Cast<AWeapon>(Item))
 	{
 		// Attach new weapon
-		Weapon->Equip(GetMesh(), "Socket_RightHand", true, this);
+		Weapon->Equip(GetMesh(), Weapon->GetSocketName(), true, this);
 		EquippedWeapon = Weapon;
 		OverlappingItem = nullptr;
+
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.OneHand")));
+		}
+	}
+	else if (AShield* Shield = Cast<AShield>(Item))
+	{
+		// Attach new weapon
+		Shield->Equip(GetMesh(), Shield->GetSocketName(), true, this);
+		EquippedShield = Shield;
+		OverlappingItem = nullptr;
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Shield")));
+		}
 	}
 }

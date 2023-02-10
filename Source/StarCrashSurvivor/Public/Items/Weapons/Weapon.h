@@ -16,8 +16,10 @@ UCLASS()
 class STARCRASHSURVIVOR_API AWeapon : public AItem
 {
 	GENERATED_BODY()
+
 public:
 	AWeapon();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -53,10 +55,15 @@ protected:
 	float BaseDamage = 20.f;
 
 	bool ActorIsSameType(const AActor* OtherActor) const;
+
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	FName SocketName = "Socket_RightHand";
+
 public:
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);
 
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
+	FORCEINLINE FName GetSocketName() const { return SocketName; }
 
 	UPROPERTY()
 	TArray<AActor*> IgnoreActors;

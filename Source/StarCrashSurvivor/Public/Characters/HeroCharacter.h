@@ -92,7 +92,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputMappingContext* HeroMappingContext;
 
-	void ActionInputWithAbility(const FInputActionInstance& InputActionInstance);
+	void ActionInputWithAbilityPressed(const FInputActionInstance& InputActionInstance);
+	void ActionInputWithAbilityReleased(const FInputActionInstance& InputActionInstance);
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ActionMove;
@@ -143,5 +144,5 @@ public:
 	void OnHideWeaponAttachToSocket();
 	void OnShowWeaponAttachToSocket();
 
-	void EquipWeapon(AWeapon* Weapon);
+	void EquipItem(AItem* Item);
 };

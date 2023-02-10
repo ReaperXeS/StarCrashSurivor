@@ -24,12 +24,12 @@ AWeapon::AWeapon()
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
 }
 
-void AWeapon::AttachToSocket(USceneComponent* InParent, const FName SocketName)
+void AWeapon::AttachToSocket(USceneComponent* InParent, const FName SocketNameParam)
 {
 	if (InParent && MeshComp)
 	{
 		ItemState = EItemState::EIS_Equipped;
-		MeshComp->AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		MeshComp->AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketNameParam);
 	}
 }
 
@@ -38,11 +38,11 @@ bool AWeapon::ActorIsSameType(const AActor* OtherActor) const
 	return GetOwner() != nullptr && OtherActor != nullptr && OtherActor->Tags.Num() > 0 && GetOwner()->ActorHasTag(OtherActor->Tags[0]);
 }
 
-void AWeapon::Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner)
+void AWeapon::Equip(USceneComponent* InParent, FName SocketNameParam, bool bPlaySound, AActor* NewOwner)
 {
 	ItemState = EItemState::EIS_Equipped;
 	SetOwner(NewOwner);
-	AttachToSocket(InParent, SocketName);
+	AttachToSocket(InParent, SocketNameParam);
 	if (bPlaySound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, EquipSound, GetActorLocation());

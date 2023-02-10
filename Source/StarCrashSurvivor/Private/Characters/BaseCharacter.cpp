@@ -2,17 +2,15 @@
 
 
 #include "Characters/BaseCharacter.h"
-
 #include "Characters/CharacterTypes.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Items/Weapons/Weapon.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameplayCueFunctionLibrary.h"
-#include "ScalableFloat.h"
 #include "AbilitySystemComponent.h"
-#include "GameplayAbilities/Public/Abilities/GameplayAbility.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
+#include "Items/Shield.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -36,6 +34,17 @@ void ABaseCharacter::BeginPlay()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	InitializeAttributeSet();
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
+}
+
+void ABaseCharacter::ApplyShieldArmor(const bool bAdd) const
+{
+	if (EquippedShield && ShieldArmorEffect)
+	{
+		const FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ShieldArmorEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+		EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.BlockValue")), bAdd ? EquippedShield->GetArmor() : -EquippedShield->GetArmor());
+
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	}
 }
 
 void ABaseCharacter::ShowDebugGAS() const
@@ -227,8 +236,12 @@ float ABaseCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, 
 
 	if (DamageEffect)
 	{
-		DamageEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(-Damage);
-		AbilitySystemComponent->ApplyGameplayEffectToSelf(DamageEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
+		const FGameplayEffectSpecHandle DamageEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DamageEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+
+		// Pass the damage to the Damage Execution Calculation through a SetByCaller value on the GameplayEffectSpec
+		DamageEffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), Damage);
+
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 	}
 	return Damage;
 }

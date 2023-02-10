@@ -7,9 +7,11 @@
 #include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Abilities/GameplayAbility.h"
 #include "BaseCharacter.generated.h"
 
 // Forward Declarations
+class AShield;
 class AWeapon;
 class UAbilitySystemComponent;
 class UBaseGameplayAbility;
@@ -40,6 +42,12 @@ protected:
 	/*				Abilities					*/
 	/********************************************/
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyShieldArmor(bool bAdd) const;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> ShieldArmorEffect;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 	bool DebugGAS = false;
 
@@ -65,6 +73,9 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AShield* EquippedShield;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	AActor* CombatTarget;

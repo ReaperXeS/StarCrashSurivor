@@ -16,6 +16,20 @@ void UHeroAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
 	}
+	else if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	{
+		// Store a local copy of the amount of damage done and clear the damage attribute
+		const float LocalDamageDone = GetDamage();
+		SetDamage(0.f);
+
+		if (LocalDamageDone > 0.0f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Damage done: %f"), LocalDamageDone);
+			// Apply the health change and then clamp it
+			const float NewHealth = GetHealth() - LocalDamageDone;
+			SetHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
+		}
+	}
 }
 
 void UHeroAttributeSet::ShowDebugOfAttribute(const FGameplayAttribute Attribute) const

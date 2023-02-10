@@ -10,4 +10,6 @@ enum class EGameplayAbilityInput : uint8
 	EGAI_Jump UMETA(DisplayName = "Jump"),
 	EGAI_ShowHideWeapon UMETA(DisplayName = "ShowHideWeapon"),
 	EGAI_AttackStrong UMETA(DisplayName = "AttackStrong"),
+	EGAI_Block UMETA(DisplayName = "Block"),
+	EGAI_BlockEnd UMETA(DisplayName = "BlockEnd"),
 };
