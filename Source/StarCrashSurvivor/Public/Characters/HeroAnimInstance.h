@@ -18,10 +18,6 @@ class STARCRASHSURVIVOR_API UHeroAnimInstance : public UAnimInstance, public IGa
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void OnAttackComboBegin();
-	UFUNCTION(BlueprintCallable)
-	void OnAttackComboEnd(FName NextAttackSectionName);
-	UFUNCTION(BlueprintCallable)
 	void OnHideWeaponAttachToSocket();
 	UFUNCTION(BlueprintCallable)
 	void OnShowWeaponAttachToSocket();
@@ -42,7 +38,7 @@ public:
 	 * @param TagContainer	[OUT] Set of tags on the asset
 	 */
 	UFUNCTION(BlueprintCallable, Category = GameplayTags)
-	void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const;
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	UPROPERTY(BlueprintReadOnly)
 	class AHeroCharacter* HeroCharacter;

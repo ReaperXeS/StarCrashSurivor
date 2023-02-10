@@ -6,7 +6,6 @@
 #include "BaseCharacter.h"
 #include "InputAction.h"
 #include "Interfaces/PickupInterface.h"
-#include "AbilitySystemInterface.h"
 #include "Abilities/HeroAttributeSet.h"
 #include "HeroCharacter.generated.h"
 
@@ -30,7 +29,7 @@ class UHeroAttributeSet;
 class UInputMappingContext;
 
 UCLASS()
-class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface, public IAbilitySystemInterface
+class STARCRASHSURVIVOR_API AHeroCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
@@ -45,7 +44,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
-
 	virtual float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	/********************************************/
@@ -53,7 +51,10 @@ public:
 	/********************************************/
 	virtual void SetOverlappingItem(AItem* Item) override;
 
+	// Apply Gold effect to the player from the Treasure
 	virtual void AddGold(class ATreasure* Treasure) override;
+
+	// Apply Soul effect to the player from the Treasure
 	virtual void AddSouls(class ASoul* Soul) override;
 
 protected:
@@ -63,86 +64,82 @@ protected:
 	/********************************************/
 	/*				Abilities					*/
 	/********************************************/
+	// Called when Attributes changes and update UI accordingly
 	void AttributeChanged(const FOnAttributeChangeData& Data);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
-	TSubclassOf<UGameplayEffect> SoulEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
-	TSubclassOf<UGameplayEffect> TreasureEffect;
-
-
+	// Camera for the Hero Character
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
 
+	// Camera Boom for the Hero Character
 	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* CameraBoom;;
+	USpringArmComponent* CameraBoom;
 
+	// Hair Component for the Hero Character
 	UPROPERTY(VisibleAnywhere)
 	UGroomComponent* Hair;
 
+	// Eye Brows Component for the Hero Character
 	UPROPERTY(VisibleAnywhere)
 	UGroomComponent* EyeBrows;
 
-	virtual void Attack() override;
-
 	/**
-	 * Input
+	 * Input Mapping Context of the Hero Character
 	 **/
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category="Reaper|Input")
 	UInputMappingContext* HeroMappingContext;
 
+	// Input Action call back when player press button of an action
 	void ActionInputWithAbilityPressed(const FInputActionInstance& InputActionInstance);
+	// Input Action call back when player release button of an action
 	void ActionInputWithAbilityReleased(const FInputActionInstance& InputActionInstance);
 
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionMove;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionLookAround;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* ActionZoomInOutCamera;
-
-	/*********************************************/
-	/* Combo Attack
-	 *********************************************/
-	bool bComboAttackWindowOpened = false;
-	bool bComboAttackTriggered = false;
-
 private:
-	/**
-	 * Movement functions
-	 */
+	// Input Action for Movement
+	UPROPERTY(EditAnywhere, Category="Reaper|Input")
+	UInputAction* ActionMove;
+	// ActionMove Input Action Callback
 	void MoveCharacter(const FInputActionValue& ActionValue);
+
+	// Input Action for Looking Around
+	UPROPERTY(EditAnywhere, Category="Reaper|Input")
+	UInputAction* ActionLookAround;
+	// ActionLookAround Input Action Callback
 	void LookAround(const FInputActionValue& ActionValue);
+
+	// Input Action for Zooming In or Out
+	UPROPERTY(EditAnywhere, Category="Reaper|Input")
+	UInputAction* ActionZoomInOutCamera;
+	// ActionZoomInOutCamera Action Callback
 	void ZoomCamera(const FInputActionValue& ActionValue);
 
+	// Function to handle moving forward/backward
 	void MoveForward(float AxisValue);
+	// Function to handle strafing
 	void MoveRight(float AxisValue);
 
+	// Reference to the Item the player is overlapping
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
-	/*****
-	 * HUD
-	 ****/
+	// Initialize the Hud Overlay
+	void InitializeHeroOverlay();
+
+	// Hud overlay for the Hero Character
 	UPROPERTY()
 	UHeroOverlay* HeroOverlay;
 
-	void InitializeHeroOverlay();
-
 public:
+	// Getter for OverlappingItem
 	FORCEINLINE AItem* GetOverlappingItem() const { return OverlappingItem; }
+	// Getter for OverlappingWeapon
 	AWeapon* GetOverlappingWeapon() const;
 
-	virtual FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
-
-
-	virtual void OnAttackComboBegin();
-	virtual void OnAttackComboEnd(FName NextAttackSectionName);
+	// Called from Anim Instance when the player is hiding his weapon
 	void OnHideWeaponAttachToSocket();
+	// Called from Anim Instance when the player is show his weapon
 	void OnShowWeaponAttachToSocket();
 
+	// Called an item is picked up
 	void EquipItem(AItem* Item);
 };
