@@ -10,6 +10,7 @@
 #include "GameplayCueFunctionLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
+#include "Items/Shield.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -33,6 +34,17 @@ void ABaseCharacter::BeginPlay()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	InitializeAttributeSet();
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
+}
+
+void ABaseCharacter::ApplyShieldArmor(const bool bAdd) const
+{
+	if (EquippedShield && ShieldArmorEffect)
+	{
+		const FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ShieldArmorEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+		EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.BlockValue")), bAdd ? EquippedShield->GetArmor() : -EquippedShield->GetArmor());
+
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	}
 }
 
 void ABaseCharacter::ShowDebugGAS() const

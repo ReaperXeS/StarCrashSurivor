@@ -32,7 +32,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	FName SocketName = "ShieldSocket";
 
+	// Armor value of the shield, applied to character when blocking
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	float Armor = 25.f;
+
 public:
+	FORCEINLINE float GetArmor() const { return Armor; }
 	FORCEINLINE FName GetSocketName() const { return SocketName; }
 
 	void Equip(USceneComponent* InParent, FName SocketName, bool bPlaySound, AActor* NewOwner);

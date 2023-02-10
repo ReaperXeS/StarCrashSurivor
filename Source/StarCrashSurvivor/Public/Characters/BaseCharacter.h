@@ -42,6 +42,12 @@ protected:
 	/*				Abilities					*/
 	/********************************************/
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyShieldArmor(bool bAdd) const;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> ShieldArmorEffect;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 	bool DebugGAS = false;
 
