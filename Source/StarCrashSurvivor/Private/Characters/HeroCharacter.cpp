@@ -153,27 +153,23 @@ void AHeroCharacter::SetOverlappingItem(AItem* Item)
 
 void AHeroCharacter::AddGold(ATreasure* Treasure)
 {
-	if (TreasureEffect && Treasure)
+	if (Treasure && Treasure->PickupGameplayEffect)
 	{
-		TreasureEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(Treasure->GetGold());
-		AbilitySystemComponent->ApplyGameplayEffectToSelf(TreasureEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
+		UGameplayEffect* Effect = Treasure->PickupGameplayEffect->GetDefaultObject<UGameplayEffect>();
+		check(Effect->Modifiers.Num() > 0);
+		Effect->Modifiers[0].ModifierMagnitude = FScalableFloat(Treasure->GetGold());
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(Effect, 1, AbilitySystemComponent->MakeEffectContext());
 	}
 }
 
 void AHeroCharacter::AddSouls(ASoul* Soul)
 {
-	if (SoulEffect && Soul)
+	if (Soul && Soul->PickupGameplayEffect)
 	{
-		SoulEffect->GetDefaultObject<UGameplayEffect>()->Modifiers[0].ModifierMagnitude = FScalableFloat(Soul->GetSouls());
-		AbilitySystemComponent->ApplyGameplayEffectToSelf(SoulEffect.GetDefaultObject(), 1, AbilitySystemComponent->MakeEffectContext());
-	}
-}
-
-void AHeroCharacter::Attack()
-{
-	if (AttackLightAbility)
-	{
-		AbilitySystemComponent->AbilityLocalInputPressed(AttackLightAbility.GetDefaultObject()->GetInputId());
+		UGameplayEffect* Effect = Soul->PickupGameplayEffect->GetDefaultObject<UGameplayEffect>();
+		check(Effect->Modifiers.Num() > 0);
+		Effect->Modifiers[0].ModifierMagnitude = FScalableFloat(Soul->GetSouls());
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(Effect, 1, AbilitySystemComponent->MakeEffectContext());
 	}
 }
 
@@ -210,21 +206,6 @@ void AHeroCharacter::ActionInputWithAbilityReleased(const FInputActionInstance& 
 AWeapon* AHeroCharacter::GetOverlappingWeapon() const
 {
 	return Cast<AWeapon>(OverlappingItem);
-}
-
-void AHeroCharacter::OnAttackComboBegin()
-{
-	bComboAttackWindowOpened = true;
-}
-
-void AHeroCharacter::OnAttackComboEnd(const FName NextAttackSectionName)
-{
-	bComboAttackWindowOpened = false;
-	if (bComboAttackTriggered)
-	{
-		PlayAnimMontage(AttackMontage, 1, NextAttackSectionName);
-		bComboAttackTriggered = false;
-	}
 }
 
 void AHeroCharacter::LookAround(const FInputActionValue& ActionValue)

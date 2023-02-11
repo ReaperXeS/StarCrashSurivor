@@ -100,6 +100,7 @@ void AWeapon::OnWeaponBoxOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		{
 			if (const IHitInterface* HitInterface = Cast<IHitInterface>(Hit.GetActor()); !ActorIsSameType(Hit.GetActor()) && HitInterface && IgnoreActors.Find(Hit.GetActor()) == INDEX_NONE)
 			{
+				// TODO: Review this logic ApplyDamage and execute get hit seems redundant
 				UGameplayStatics::ApplyDamage(Hit.GetActor(), BaseDamage, GetOwner() ? GetOwner()->GetInstigatorController() : nullptr, this, UDamageType::StaticClass());
 				HitInterface->Execute_GetHit(Hit.GetActor(), Hit.ImpactPoint, GetOwner());
 			}

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+class UGameplayEffect;
 class UStaticMeshComponent;
 class UNiagaraComponent;
 class USphereComponent;
@@ -28,6 +29,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,10 +40,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hovering Parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reaper|Hovering Parameters")
 	float Amplitude = 0.25f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hovering Parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reaper|Hovering Parameters")
 	float TimeConstant = 5.f;
 
 	float TransformedSin() const;
@@ -54,15 +56,20 @@ protected:
 
 	EItemState ItemState = EItemState::EIS_Hovering;
 
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	UPROPERTY(VisibleAnywhere, Category = "Reaper|Effects")
 	UNiagaraComponent* ItemEffect;
 
-	UPROPERTY(EditAnywhere, Category = "Effects")
+	UPROPERTY(EditAnywhere, Category = "Reaper|Effects")
 	class UNiagaraSystem* PickupEffect;
 
-	UPROPERTY(EditAnywhere, Category = "Sounds")
+	UPROPERTY(EditAnywhere, Category = "Reaper|Sounds")
 	USoundBase* PickupSound;
 
 	void SpawnPickupSound() const;
 	void SpawnPickupEffect() const;
+
+public:
+	// Effect to applied when picked up
+	UPROPERTY(EditAnywhere, Category="Reaper|Effects")
+	TSubclassOf<UGameplayEffect> PickupGameplayEffect;
 };

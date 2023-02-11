@@ -61,15 +61,6 @@ void ABaseCharacter::InitializeAttributeSet()
 	AttributeSet = AbilitySystemComponent->GetSet<UHeroAttributeSet>();
 }
 
-bool ABaseCharacter::CanAttack() const
-{
-	return true;
-}
-
-void ABaseCharacter::Attack()
-{
-}
-
 void ABaseCharacter::Die_Implementation()
 {
 	if (IsDead()) { return; }
@@ -172,6 +163,8 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 	}
 
 	UpdateWeaponCollision(ECollisionEnabled::NoCollision);
+
+	// TODO: Seems complex but triggered ability for hit react
 
 	FGameplayCueParameters CueParameters;
 	CueParameters.Instigator = Hitter;
