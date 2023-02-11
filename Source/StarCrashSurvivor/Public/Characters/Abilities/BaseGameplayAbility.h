@@ -23,11 +23,11 @@ protected:
 	EGameplayAbilityInput InputId;
 
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* InputAction;
+	TObjectPtr<UInputAction> InputAction;
 
 public:
 	FORCEINLINE int32 GetInputId() const { return static_cast<int32>(InputId); }
-	FORCEINLINE UInputAction* GetInputAction() const { return InputAction; }
+	FORCEINLINE TObjectPtr<UInputAction> GetInputAction() const { return InputAction; }
 
-	ABaseCharacter* GetOwningCharacter() const;
+	TObjectPtr<ABaseCharacter> GetOwningCharacter() const;
 };

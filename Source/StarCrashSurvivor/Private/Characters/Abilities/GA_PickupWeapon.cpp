@@ -6,7 +6,7 @@
 #include "Items/Weapons/Weapon.h"
 #include "AbilitySystemComponent.h"
 
-AHeroCharacter* UGA_PickupWeapon::GetHeroCharacter() const
+TObjectPtr<AHeroCharacter> UGA_PickupWeapon::GetHeroCharacter() const
 {
 	return Cast<AHeroCharacter>(GetOwningActorFromActorInfo());
 }

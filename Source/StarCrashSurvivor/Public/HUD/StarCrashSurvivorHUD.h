@@ -14,14 +14,15 @@ UCLASS()
 class STARCRASHSURVIVOR_API AStarCrashSurvivorHUD : public AHUD
 {
 	GENERATED_BODY()
+
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UHeroOverlay> HeroOverlayClass;
+
 private:
-	UPROPERTY()
-	UHeroOverlay* HeroOverlay;
+	TObjectPtr<UHeroOverlay> HeroOverlay;
 
 public:
 	FORCEINLINE UHeroOverlay* GetHeroOverlay() const { return HeroOverlay; }

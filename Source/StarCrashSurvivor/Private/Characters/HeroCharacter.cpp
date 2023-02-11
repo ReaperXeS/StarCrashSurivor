@@ -204,7 +204,7 @@ void AHeroCharacter::ActionInputWithAbilityReleased(const FInputActionInstance& 
 	}
 }
 
-AWeapon* AHeroCharacter::GetOverlappingWeapon() const
+TObjectPtr<AWeapon> AHeroCharacter::GetOverlappingWeapon() const
 {
 	return Cast<AWeapon>(OverlappingItem);
 }

@@ -21,19 +21,21 @@ public:
 	ABreakableActor();
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	UGeometryCollectionComponent* GeometryCollection;
+	TObjectPtr<UGeometryCollectionComponent> GeometryCollection;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UCapsuleComponent* CapsuleComponent;
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
 	bool bBroken = false;
+
 public:
 };

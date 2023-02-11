@@ -18,12 +18,11 @@ class STARCRASHSURVIVOR_API ABaseAIController : public AAIController
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	UBehaviorTree* BehaviorTree;
+	TObjectPtr<UBehaviorTree> BehaviorTree;
 
 	virtual void OnPossess(APawn* InPawn) override;
 
-	UPROPERTY()
-	AEnemy* EnemyPawn;
+	TObjectPtr<AEnemy> EnemyPawn;
 
 	virtual void Tick(float DeltaTime) override;
 };

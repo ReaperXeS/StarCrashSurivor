@@ -41,10 +41,10 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	UPROPERTY(BlueprintReadOnly)
-	class AHeroCharacter* HeroCharacter;
+	TObjectPtr<class AHeroCharacter> HeroCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	class UCharacterMovementComponent* HeroMovementComponent;
+	TObjectPtr<class UCharacterMovementComponent> HeroMovementComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float GroundSpeed = 0.f;

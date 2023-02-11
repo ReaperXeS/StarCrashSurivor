@@ -71,11 +71,11 @@ protected:
 
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Reaper|Abilities")
-	UAbilitySystemComponent* AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	// Attribute set for the character via DataTable
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Reaper|Abilities")
-	const UHeroAttributeSet* AttributeSet;
+	TObjectPtr<const UHeroAttributeSet> AttributeSet;
 
 	// Abilities granted to the character on spawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reaper|Abilities")
@@ -87,15 +87,15 @@ protected:
 
 	// Reference to the Weapon currently equipped 
 	UPROPERTY(VisibleInstanceOnly)
-	AWeapon* EquippedWeapon;
+	TObjectPtr<AWeapon> EquippedWeapon;
 
 	// Reference to the Shield currently equipped 
 	UPROPERTY(VisibleInstanceOnly)
-	AShield* EquippedShield;
+	TObjectPtr<AShield> EquippedShield;
 
 	// Current combat target of the character, set only for the enemy right now
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reaper|AI")
-	AActor* CombatTarget;
+	TObjectPtr<AActor> CombatTarget;
 
 	// Called from blueprint when the character dies
 	UFUNCTION(BlueprintNativeEvent)
@@ -118,11 +118,11 @@ protected:
 
 	// Montage to play when the character dies
 	UPROPERTY(EditDefaultsOnly, Category = "Reaper|Animation")
-	UAnimMontage* DeathMontage;
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 	// Montage to play when the character gets hit
 	UPROPERTY(EditDefaultsOnly, Category = "Reaper|Animation")
-	UAnimMontage* HitReactMontage;
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	// Debug flag to show trace and some more info
 	UPROPERTY(EditAnywhere, Category = "Reaper|Development")
@@ -160,5 +160,5 @@ public:
 	FORCEINLINE EDeathState GetDeathState() const { return DeathState; }
 
 	// Getter for CombatTarget used for AI
-	FORCEINLINE AActor* GetCombatTarget() const { return CombatTarget; }
+	FORCEINLINE TObjectPtr<AActor> GetCombatTarget() const { return CombatTarget; }
 };

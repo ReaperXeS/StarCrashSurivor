@@ -31,16 +31,16 @@ protected:
 	void AttachToSocket(USceneComponent* InParent, FName SocketName);
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
-	USoundBase* EquipSound;
+	TObjectPtr<USoundBase> EquipSound;
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon")
-	UBoxComponent* WeaponBox;
+	TObjectPtr<UBoxComponent> WeaponBox;
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon")
-	USceneComponent* BoxTraceStart;
+	TObjectPtr<USceneComponent> BoxTraceStart;
 
 	UPROPERTY(VisibleAnywhere, Category="Weapon")
-	USceneComponent* BoxTraceEnd;
+	TObjectPtr<USceneComponent> BoxTraceEnd;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	FVector BoxTraceExtent = FVector(5.f, 5.f, 5.f);
@@ -65,6 +65,5 @@ public:
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
 	FORCEINLINE FName GetSocketName() const { return SocketName; }
 
-	UPROPERTY()
-	TArray<AActor*> IgnoreActors;
+	TArray<TObjectPtr<AActor>> IgnoreActors;
 };

@@ -15,18 +15,20 @@ UCLASS()
 class STARCRASHSURVIVOR_API UHeroOverlay : public UUserWidget
 {
 	GENERATED_BODY()
+
 protected:
 	UPROPERTY(meta = (BindWidget))
-	UProgressBar* HealthProgressBar;
+	TObjectPtr<UProgressBar> HealthProgressBar;
 
 	UPROPERTY(meta = (BindWidget))
-	UProgressBar* StaminaProgressBar;
+	TObjectPtr<UProgressBar> StaminaProgressBar;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* GoldText;
+	TObjectPtr<UTextBlock> GoldText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* SoulText;
+	TObjectPtr<UTextBlock> SoulText;
+
 public:
 	void SetGold(const int32 Amount) const;
 	void SetSoul(const int32 Amount) const;
