@@ -15,6 +15,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Abilities/CustomGameplayTags.h"
 #include "GameplayAbilities/Public/Abilities/GameplayAbility.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
 #include "Characters/Abilities/BaseGameplayAbility.h"
@@ -135,7 +136,7 @@ void AHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 	{
 		FGameplayTagContainer TagContainer;
 		GetOwnedGameplayTags(TagContainer);
-		TagContainer.AddTag(FGameplayTag::RequestGameplayTag("ActionState.HitReaction"));
+		TagContainer.AddTag(TAG_ActionState_HitReaction);
 	}
 }
 
@@ -300,7 +301,7 @@ void AHeroCharacter::EquipItem(AItem* Item)
 
 		if (GetAbilitySystemComponent())
 		{
-			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.OneHand")));
+			GetAbilitySystemComponent()->AddLooseGameplayTag(TAG_Weapon_OneHand);
 		}
 	}
 	else if (AShield* Shield = Cast<AShield>(Item))
@@ -311,7 +312,7 @@ void AHeroCharacter::EquipItem(AItem* Item)
 		OverlappingItem = nullptr;
 		if (GetAbilitySystemComponent())
 		{
-			GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Shield")));
+			GetAbilitySystemComponent()->AddLooseGameplayTag(TAG_Weapon_Shield);
 		}
 	}
 }

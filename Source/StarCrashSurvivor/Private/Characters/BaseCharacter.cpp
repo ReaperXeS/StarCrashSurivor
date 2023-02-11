@@ -9,6 +9,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameplayCueFunctionLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Abilities/CustomGameplayTags.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
 #include "Items/Shield.h"
 
@@ -41,7 +42,7 @@ void ABaseCharacter::ApplyShieldArmor(const bool bAdd) const
 	if (EquippedShield && ShieldArmorEffect)
 	{
 		const FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ShieldArmorEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
-		EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.BlockValue")), bAdd ? EquippedShield->GetArmor() : -EquippedShield->GetArmor());
+		EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_BlockValue, bAdd ? EquippedShield->GetArmor() : -EquippedShield->GetArmor());
 
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
@@ -169,7 +170,7 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 	FGameplayCueParameters CueParameters;
 	CueParameters.Instigator = Hitter;
 	CueParameters.Location = ImpactPoint;
-	UGameplayCueFunctionLibrary::ExecuteGameplayCueOnActor(this, FGameplayTag::RequestGameplayTag("GameplayCue.DamageTaken"), CueParameters);
+	UGameplayCueFunctionLibrary::ExecuteGameplayCueOnActor(this, TAG_GameplayCue_DamageTaken, CueParameters);
 }
 
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
@@ -232,7 +233,7 @@ float ABaseCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, 
 		const FGameplayEffectSpecHandle DamageEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DamageEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
 
 		// Pass the damage to the Damage Execution Calculation through a SetByCaller value on the GameplayEffectSpec
-		DamageEffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), Damage);
+		DamageEffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_Damage, Damage);
 
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 	}
