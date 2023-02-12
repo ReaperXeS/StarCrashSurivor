@@ -9,6 +9,7 @@
 class UGameplayEffect;
 class UStaticMeshComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 class USphereComponent;
 
 UENUM(BlueprintType)
@@ -35,10 +36,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshComp;
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 
 	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComp;
+	TObjectPtr<USphereComponent> SphereComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reaper|Hovering Parameters")
 	float Amplitude = 0.25f;
@@ -57,13 +58,13 @@ protected:
 	EItemState ItemState = EItemState::EIS_Hovering;
 
 	UPROPERTY(VisibleAnywhere, Category = "Reaper|Effects")
-	UNiagaraComponent* ItemEffect;
+	TObjectPtr<UNiagaraComponent> ItemEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Reaper|Effects")
-	class UNiagaraSystem* PickupEffect;
+	TObjectPtr<UNiagaraSystem> PickupEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Reaper|Sounds")
-	USoundBase* PickupSound;
+	TObjectPtr<USoundBase> PickupSound;
 
 	void SpawnPickupSound() const;
 	void SpawnPickupEffect() const;

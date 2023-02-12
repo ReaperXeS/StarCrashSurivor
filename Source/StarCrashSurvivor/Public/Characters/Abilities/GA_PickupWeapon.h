@@ -16,7 +16,7 @@ class STARCRASHSURVIVOR_API UGA_PickupWeapon : public UBaseGameplayAbility
 	GENERATED_BODY()
 
 protected:
-	AHeroCharacter* GetHeroCharacter() const;
+	TObjectPtr<AHeroCharacter> GetHeroCharacter() const;
 
 public:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;

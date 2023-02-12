@@ -4,7 +4,7 @@
 #include "Characters/Abilities/BaseGameplayAbility.h"
 #include "Characters/BaseCharacter.h"
 
-ABaseCharacter* UBaseGameplayAbility::GetOwningCharacter() const
+TObjectPtr<ABaseCharacter> UBaseGameplayAbility::GetOwningCharacter() const
 {
 	return Cast<ABaseCharacter>(GetOwningActorFromActorInfo());
 }

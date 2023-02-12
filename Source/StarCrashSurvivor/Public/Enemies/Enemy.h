@@ -36,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UHealthBarComponent* HealthBarWidget;
+	TObjectPtr<UHealthBarComponent> HealthBarWidget;
 
 	/********************************************/
 	/*				Abilities					*/
@@ -45,7 +45,7 @@ protected:
 	virtual void InitializeAttributeSet() override;
 
 	UPROPERTY(BlueprintReadOnly)
-	const UBaseEnemyAttributeSet* EnemyAttributeSet;
+	TObjectPtr<const UBaseEnemyAttributeSet> EnemyAttributeSet;
 
 	void AttributeChanged(const FOnAttributeChangeData& Data) const;
 
@@ -62,14 +62,13 @@ protected:
 	/**
 	 * AI
 	 */
-	UPROPERTY()
-	AAIController* AIController;
+	TObjectPtr<AAIController> AIController;
 
 	UPROPERTY(EditInstanceOnly, Category = "AI")
-	AActor* CurrentPatrolTarget;
+	TObjectPtr<AActor> CurrentPatrolTarget;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "AI")
-	TArray<AActor*> PatrolTargets;
+	TArray<TObjectPtr<AActor>> PatrolTargets;
 
 	bool InTargetRange(const AActor* Target, double Radius) const;
 
@@ -77,7 +76,7 @@ protected:
 	AActor* ComputeNewPatrolTarget();
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
-	UPawnSensingComponent* PawnSensingComponent;
+	TObjectPtr<UPawnSensingComponent> PawnSensingComponent;
 
 	UFUNCTION()
 	void PawnSeen(APawn* Pawn);

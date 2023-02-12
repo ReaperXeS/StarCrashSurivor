@@ -5,6 +5,7 @@
 
 // Copyright 2020 Dan Kestranek.
 
+#include "Abilities/CustomGameplayTags.h"
 #include "Abilities/RXAbilitySystemComponent.h"
 #include "Characters/Abilities/HeroAttributeSet.h"
 
@@ -66,7 +67,7 @@ void URXDamageExecCalculation::Execute_Implementation(const FGameplayEffectCusto
 	// Capture optional damage value set on the damage GE as a CalculationModifier under the ExecutionCalculation
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
 	// Add SetByCaller damage if it exists
-	Damage += FMath::Max<float>(Spec.GetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), false, -1.0f), 0.0f);
+	Damage += FMath::Max<float>(Spec.GetSetByCallerMagnitude(TAG_Data_Damage, false, -1.0f), 0.0f);
 
 	const float UnmitigatedDamage = Damage; // Can multiply any damage boosters here
 	const float MitigatedDamage = (UnmitigatedDamage) * (100 / (100 + Armor));

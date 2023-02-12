@@ -24,10 +24,10 @@ protected:
 	void AttachToSocket(USceneComponent* InParent, FName SocketName);
 
 	UPROPERTY(VisibleAnywhere, Category="Shield")
-	UBoxComponent* ShieldBox;
+	TObjectPtr<UBoxComponent> ShieldBox;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
-	USoundBase* EquipSound;
+	TObjectPtr<USoundBase> EquipSound;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	FName SocketName = "ShieldSocket";

@@ -69,25 +69,25 @@ protected:
 
 	// Camera for the Hero Character
 	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* Camera;
+	TObjectPtr<UCameraComponent> Camera;
 
 	// Camera Boom for the Hero Character
 	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* CameraBoom;
+	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	// Hair Component for the Hero Character
 	UPROPERTY(VisibleAnywhere)
-	UGroomComponent* Hair;
+	TObjectPtr<UGroomComponent> Hair;
 
 	// Eye Brows Component for the Hero Character
 	UPROPERTY(VisibleAnywhere)
-	UGroomComponent* EyeBrows;
+	TObjectPtr<UGroomComponent> EyeBrows;
 
 	/**
 	 * Input Mapping Context of the Hero Character
 	 **/
 	UPROPERTY(EditAnywhere, Category="Reaper|Input")
-	UInputMappingContext* HeroMappingContext;
+	TObjectPtr<UInputMappingContext> HeroMappingContext;
 
 	// Input Action call back when player press button of an action
 	void ActionInputWithAbilityPressed(const FInputActionInstance& InputActionInstance);
@@ -97,19 +97,19 @@ protected:
 private:
 	// Input Action for Movement
 	UPROPERTY(EditAnywhere, Category="Reaper|Input")
-	UInputAction* ActionMove;
+	TObjectPtr<UInputAction> ActionMove;
 	// ActionMove Input Action Callback
 	void MoveCharacter(const FInputActionValue& ActionValue);
 
 	// Input Action for Looking Around
 	UPROPERTY(EditAnywhere, Category="Reaper|Input")
-	UInputAction* ActionLookAround;
+	TObjectPtr<UInputAction> ActionLookAround;
 	// ActionLookAround Input Action Callback
 	void LookAround(const FInputActionValue& ActionValue);
 
 	// Input Action for Zooming In or Out
 	UPROPERTY(EditAnywhere, Category="Reaper|Input")
-	UInputAction* ActionZoomInOutCamera;
+	TObjectPtr<UInputAction> ActionZoomInOutCamera;
 	// ActionZoomInOutCamera Action Callback
 	void ZoomCamera(const FInputActionValue& ActionValue);
 
@@ -120,20 +120,19 @@ private:
 
 	// Reference to the Item the player is overlapping
 	UPROPERTY(VisibleInstanceOnly)
-	AItem* OverlappingItem;
+	TObjectPtr<AItem> OverlappingItem;
 
 	// Initialize the Hud Overlay
 	void InitializeHeroOverlay();
 
 	// Hud overlay for the Hero Character
-	UPROPERTY()
-	UHeroOverlay* HeroOverlay;
+	TObjectPtr<UHeroOverlay> HeroOverlay;
 
 public:
 	// Getter for OverlappingItem
 	FORCEINLINE AItem* GetOverlappingItem() const { return OverlappingItem; }
 	// Getter for OverlappingWeapon
-	AWeapon* GetOverlappingWeapon() const;
+	TObjectPtr<AWeapon> GetOverlappingWeapon() const;
 
 	// Called from Anim Instance when the player is hiding his weapon
 	void OnHideWeaponAttachToSocket();
