@@ -29,7 +29,10 @@ void AWeapon::AttachToSocket(USceneComponent* InParent, const FName SocketNamePa
 	if (InParent && MeshComp)
 	{
 		ItemState = EItemState::EIS_Equipped;
-		MeshComp->AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketNameParam);
+		if (!MeshComp->AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketNameParam))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Weapon %s failed to attach to socket %s"), *GetName(), *SocketNameParam.ToString());
+		}
 	}
 }
 
