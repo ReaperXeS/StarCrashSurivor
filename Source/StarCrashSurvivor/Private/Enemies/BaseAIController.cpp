@@ -26,5 +26,6 @@ void ABaseAIController::Tick(float DeltaTime)
 	{
 		EnemyPawn->CheckCombatTarget();
 		GetBlackboardComponent()->SetValueAsObject(FName("CombatTarget"), EnemyPawn->GetCombatTarget());
+		GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), EnemyPawn->IsDead());
 	}
 }
